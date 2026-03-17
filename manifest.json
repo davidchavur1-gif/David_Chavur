@@ -1,0 +1,17 @@
+{
+  "name": "Pallet Jack Safety Quiz",
+  "short_name": "PJ Safety",
+  "description": "Interactive pallet jack safety training quiz",
+  "start_url": "/pallet-jack-quiz/",
+  "display": "standalone",
+  "background_color": "#1e3a8a",
+  "theme_color": "#1e40af",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f6d2.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    }
+  ]
+}
