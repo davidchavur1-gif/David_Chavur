@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pallet Jack Safety — Training Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#05101f;
+  --blue:#1a56db;
+  --blue-light:#3b82f6;
+  --blue-glow:#60a5fa;
+  --steel:#0d2347;
+  --steel2:#0f2d52;
+  --accent:#00d4ff;
+  --red:#ef4444;
+  --green:#22c55e;
+  --amber:#f59e0b;
+  --text:#e2e8f0;
+  --muted:#64748b;
+  --border:#1e3a6e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
+body{font-family:'DM Sans',sans-serif;color:var(--text);cursor:default}
+
+/* CANVAS */
+#canvas{width:100%;height:100vh;position:relative;overflow:hidden}
+
+/* BACKGROUND GRID */
+#canvas::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(26,86,219,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(26,86,219,0.07) 1px,transparent 1px);
+  background-size:60px 60px;
+  z-index:0;
+}
+
+/* WORLD — all slides live here, Prezi-style */
+#world{position:absolute;width:5000px;height:4000px;transform-origin:0 0;transition:transform 0.8s cubic-bezier(0.4,0,0.2,1);will-change:transform}
+
+/* SLIDE NODE */
+.node{
+  position:absolute;
+  width:860px;
+  min-height:500px;
+  background:var(--steel);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:52px 56px;
+  overflow:hidden;
+  box-shadow:0 0 80px rgba(26,86,219,0.12);
+}
+.node::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--blue),var(--accent),transparent);
+  border-radius:24px 24px 0 0;
+}
+
+/* CONNECTING LINES between nodes */
+#connections{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+/* TYPOGRAPHY */
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;opacity:0.9}
+h1.display{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;line-height:1.05;color:#fff;margin-bottom:16px}
+h2.title{font-family:'Syne',sans-serif;font-size:30px;font-weight:700;line-height:1.2;color:#fff;margin-bottom:10px}
+p.lead{font-size:17px;color:#94a3b8;line-height:1.7;margin-bottom:20px}
+p.body{font-size:15px;color:#94a3b8;line-height:1.6;margin-bottom:10px}
+.accent-line{width:40px;height:3px;background:var(--blue);border-radius:2px;margin-bottom:24px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;letter-spacing:0.04em}
+.badge-blue{background:rgba(26,86,219,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3)}
+.badge-green{background:rgba(34,197,94,0.15);color:#86efac;border:1px solid rgba(34,197,94,0.3)}
+.badge-red{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3)}
+.badge-amber{background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.3)}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}
+.stat{background:rgba(5,16,31,0.6);border:1px solid var(--border);border-radius:14px;padding:20px 16px;text-align:center}
+.stat-n{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--blue-light);line-height:1}
+.stat-l{font-size:12px;color:var(--muted);margin-top:6px;font-weight:500;line-height:1.4}
+
+/* GRID CARDS */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.card{background:rgba(5,16,31,0.5);border:1px solid var(--border);border-radius:14px;padding:18px;transition:border-color 0.2s,transform 0.2s}
+.card:hover{border-color:var(--blue-light);transform:translateY(-2px)}
+.card.danger{border-left:3px solid var(--red)}
+.card.success{border-left:3px solid var(--green)}
+.card.warning{border-left:3px solid var(--amber)}
+.card-icon{font-size:22px;margin-bottom:10px}
+.card-title{font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:6px}
+.card-body{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* LIST ITEMS */
+.li{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.dot{width:7px;height:7px;border-radius:50%;margin-top:7px;flex-shrink:0}
+.dot-blue{background:var(--blue-light)}
+.dot-red{background:var(--red)}
+.dot-green{background:var(--green)}
+.dot-amber{background:var(--amber)}
+.li-text{font-size:14px;color:#94a3b8;line-height:1.5}
+.li-text strong{color:#e2e8f0;font-weight:600}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.col-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:4px 12px;border-radius:4px;display:inline-block;margin-bottom:14px}
+.col-do{background:rgba(34,197,94,0.15);color:#86efac}
+.col-dont{background:rgba(239,68,68,0.15);color:#fca5a5}
+
+/* STEPS */
+.step{display:flex;gap:16px;margin-bottom:16px;align-items:flex-start}
+.step-n{width:32px;height:32px;border-radius:50%;background:rgba(26,86,219,0.2);border:1.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#93c5fd;flex-shrink:0;font-family:'Syne',sans-serif}
+.step-title{font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:3px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.4}
+
+/* RULE BOX */
+.rule{background:rgba(5,16,31,0.7);border:1.5px solid var(--blue);border-radius:16px;padding:20px 24px;margin:16px 0;text-align:center;position:relative;overflow:hidden}
+.rule::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.rule-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#fff;line-height:1.4}
+.rule-sub{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* HAZARD GRID */
+.hazards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.haz{background:rgba(5,16,31,0.5);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;transition:all 0.2s;cursor:default}
+.haz:hover{border-color:var(--blue-light);background:rgba(26,86,219,0.1)}
+.haz-icon{font-size:24px;margin-bottom:8px}
+.haz-title{font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:4px}
+.haz-desc{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* PPE GRID */
+.ppe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.ppe{background:rgba(5,16,31,0.5);border:1px solid var(--border);border-radius:12px;padding:16px 10px;text-align:center;transition:all 0.2s}
+.ppe:hover{border-color:var(--accent);transform:scale(1.03)}
+.ppe-icon{font-size:28px;margin-bottom:8px}
+.ppe-name{font-size:12px;font-weight:600;color:#cbd5e1}
+
+/* DIVIDER */
+.div{width:100%;height:1px;background:var(--border);margin:16px 0}
+
+/* COVER special */
+.cover-glow{position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(26,86,219,0.15) 0%,transparent 70%);pointer-events:none}
+.cover-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block;margin-right:8px}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.4)}50%{opacity:0.8;box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+
+/* NAV UI */
+#ui{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(5,16,31,0.92);backdrop-filter:blur(16px);border-top:1px solid var(--border)}
+.nav-btn{background:rgba(26,86,219,0.2);border:1px solid var(--border);color:#93c5fd;padding:9px 22px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.nav-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.nav-btn:disabled{opacity:0.25;cursor:default}
+#slide-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:400px}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--border);cursor:pointer;transition:all 0.2s;border:none}
+.sdot.active{background:var(--blue-light);width:22px;border-radius:4px}
+#counter{font-size:12px;color:var(--muted);font-weight:500;min-width:48px;text-align:right}
+
+/* PROGRESS BAR */
+#prog-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--accent));transition:width 0.4s ease;z-index:200}
+
+/* SLIDE NUMBER TAG */
+.slide-num{position:absolute;top:20px;right:24px;font-size:11px;color:var(--border);font-weight:600;font-family:'Syne',sans-serif}
+
+/* ANIMATIONS for items */
+.node .anim-item{opacity:0;transform:translateY(16px);transition:opacity 0.4s ease,transform 0.4s ease}
+.node.visible .anim-item{opacity:1;transform:translateY(0)}
+.node.visible .anim-item:nth-child(1){transition-delay:0.1s}
+.node.visible .anim-item:nth-child(2){transition-delay:0.18s}
+.node.visible .anim-item:nth-child(3){transition-delay:0.26s}
+.node.visible .anim-item:nth-child(4){transition-delay:0.34s}
+.node.visible .anim-item:nth-child(5){transition-delay:0.42s}
+.node.visible .anim-item:nth-child(6){transition-delay:0.5s}
+.node.visible .anim-item:nth-child(7){transition-delay:0.58s}
+</style>
+</head>
+<body>
+
+<div id="prog-bar" style="width:6.25%"></div>
+
+<div id="canvas">
+  <div id="world">
+    <svg id="connections"></svg>
+
+    <!-- SLIDE 1: COVER -->
+    <div class="node" id="s0" style="left:100px;top:200px">
+      <div class="cover-glow"></div>
+      <div class="slide-num">01</div>
+      <div class="anim-item" style="display:flex;align-items:center;gap:8px;margin-bottom:20px">
+        <span class="cover-dot"></span>
+        <span style="font-size:12px;font-weight:600;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase">Safety Training</span>
+      </div>
+      <h1 class="display anim-item">Pallet Jack<br>Safety</h1>
+      <p class="lead anim-item">Best practices & guidelines for safe operation<br>in warehouse environments — OSHA compliant</p>
+      <div class="anim-item" style="display:flex;gap:10px;flex-wrap:wrap">
+        <span class="badge badge-blue">16 Slides</span>
+        <span class="badge badge-green">OSHA 29 CFR 1910.178</span>
+        <span class="badge badge-amber">All Operators</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: STATS -->
+    <div class="node" id="s1" style="left:1100px;top:200px">
+      <div class="slide-num">02</div>
+      <div class="eyebrow anim-item">Why it matters</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">The numbers behind<br>pallet jack accidents</h2>
+      <div class="stats anim-item">
+        <div class="stat"><div class="stat-n">34,900</div><div class="stat-l">injuries/year in US warehouses</div></div>
+        <div class="stat"><div class="stat-n">85%</div><div class="stat-l">preventable with proper training</div></div>
+        <div class="stat"><div class="stat-n">#1</div><div class="stat-l">cause: operator error</div></div>
+      </div>
+      <p class="body anim-item">Most accidents happen not because of equipment failure — but because of untrained or inattentive operators making preventable mistakes.</p>
+    </div>
+
+    <!-- SLIDE 3: TYPES -->
+    <div class="node" id="s2" style="left:2100px;top:200px">
+      <div class="slide-num">03</div>
+      <div class="eyebrow anim-item">Equipment</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Types of pallet jacks</h2>
+      <div class="cards anim-item">
+        <div class="card"><div class="card-icon">🔵</div><div class="card-title">Manual pallet jack</div><div class="card-body">Operator-powered hydraulic pump. Up to 5,500 lbs. Most common in small warehouses.</div></div>
+        <div class="card"><div class="card-icon">⚡</div><div class="card-title">Electric pallet jack</div><div class="card-body">Battery-powered motor. Reduces operator strain. Requires charging protocol.</div></div>
+        <div class="card"><div class="card-icon">🏗️</div><div class="card-title">Ride-on pallet jack</div><div class="card-body">Operator rides on platform. Used for long distances. Requires certification.</div></div>
+        <div class="card"><div class="card-icon">📦</div><div class="card-title">High-lift pallet jack</div><div class="card-body">Raises loads higher for ergonomic work. Lower capacity. Not for racking.</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: INSPECTION -->
+    <div class="node" id="s3" style="left:3100px;top:200px">
+      <div class="slide-num">04</div>
+      <div class="eyebrow anim-item">Pre-operation</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Pre-shift inspection checklist</h2>
+      <div class="two-col anim-item" style="margin-top:16px">
+        <div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Forks</strong> — no cracks, bends or damage</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Wheels</strong> — rotate freely, no flat spots</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Handle</strong> — secure, no loose parts</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Brakes</strong> — engage and release properly</div></div>
+        </div>
+        <div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Hydraulics</strong> — raises and lowers smoothly</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Capacity label</strong> — visible and legible</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Battery</strong> — charged (electric models)</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text"><strong>Tag out</strong> if any defect found</div></div>
+        </div>
+      </div>
+      <div class="rule anim-item"><div class="rule-text">Never use a pallet jack that fails inspection</div><div class="rule-sub">Report immediately — tag it out of service</div></div>
+    </div>
+
+    <!-- SLIDE 5: LOAD CAPACITY -->
+    <div class="node" id="s4" style="left:100px;top:900px">
+      <div class="slide-num">05</div>
+      <div class="eyebrow anim-item">Load limits</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Capacity & load management</h2>
+      <p class="lead anim-item">The rated capacity is a hard engineering limit — not a guideline.</p>
+      <div class="anim-item">
+        <div class="li"><div class="dot dot-red"></div><div class="li-text"><strong>Never exceed</strong> the manufacturer's rated capacity (typically 4,500–5,500 lbs)</div></div>
+        <div class="li"><div class="dot dot-amber"></div><div class="li-text"><strong>Check the load</strong> before picking up — unlabeled pallets may be heavier than they look</div></div>
+        <div class="li"><div class="dot dot-amber"></div><div class="li-text"><strong>Split oversized loads</strong> — two trips is always the right answer</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Center the load</strong> on the forks — uneven loads shift center of gravity</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Wrap or secure</strong> unstable loads before moving</div></div>
+      </div>
+      <div class="div"></div>
+      <p class="body anim-item" style="color:#ef4444;font-weight:600">Overloading causes hydraulic failure, tip-overs, and structural collapse — instantly, without warning.</p>
+    </div>
+
+    <!-- SLIDE 6: PPE -->
+    <div class="node" id="s5" style="left:1100px;top:900px">
+      <div class="slide-num">06</div>
+      <div class="eyebrow anim-item">PPE</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Required protective equipment</h2>
+      <div class="ppe-grid anim-item">
+        <div class="ppe"><div class="ppe-icon">⛑️</div><div class="ppe-name">Hard hat</div></div>
+        <div class="ppe"><div class="ppe-icon">🥽</div><div class="ppe-name">Safety glasses</div></div>
+        <div class="ppe"><div class="ppe-icon">🦺</div><div class="ppe-name">Hi-vis vest</div></div>
+        <div class="ppe"><div class="ppe-icon">🥾</div><div class="ppe-name">Safety boots</div></div>
+        <div class="ppe"><div class="ppe-icon">🧤</div><div class="ppe-name">Gloves</div></div>
+        <div class="ppe"><div class="ppe-icon">🔇</div><div class="ppe-name">Hearing protection</div></div>
+      </div>
+      <div class="rule anim-item" style="border-color:var(--amber)"><div class="rule-text" style="color:#fcd34d">PPE is mandatory at all times in the operating area</div><div class="rule-sub">No exceptions. No excuses.</div></div>
+    </div>
+
+    <!-- SLIDE 7: TRAVEL -->
+    <div class="node" id="s6" style="left:2100px;top:900px">
+      <div class="slide-num">07</div>
+      <div class="eyebrow anim-item">Operation</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Safe travel & fork height</h2>
+      <div class="two-col anim-item">
+        <div>
+          <span class="col-head col-do">Always do</span>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Forks <strong>4–6 inches off floor</strong> while traveling</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Walk <strong>beside or behind</strong> the load</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Travel at <strong>walking pace</strong> only</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Slow down on <strong>turns and corners</strong></div></div>
+        </div>
+        <div>
+          <span class="col-head col-dont">Never do</span>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Never travel with forks fully raised</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Never ride on forks or pallet</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Never carry passengers</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Never use phone while operating</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: SLOPES -->
+    <div class="node" id="s7" style="left:3100px;top:900px">
+      <div class="slide-num">08</div>
+      <div class="eyebrow anim-item">Slopes & ramps</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Operating on inclines</h2>
+      <div class="rule anim-item"><div class="rule-text">Load always uphill — operator always walks downhill</div><div class="rule-sub">This keeps gravity working in your favor at all times</div></div>
+      <div class="anim-item" style="margin-top:16px">
+        <div class="li"><div class="dot dot-amber"></div><div class="li-text">Never turn a loaded pallet jack on a slope — tip-over risk is extreme</div></div>
+        <div class="li"><div class="dot dot-amber"></div><div class="li-text">Slow down significantly before reaching inclines</div></div>
+        <div class="li"><div class="dot dot-red"></div><div class="li-text">Never leave a loaded jack unattended on a slope</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text">Check the slope rating — never exceed equipment's rated incline</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text">Electric models: use speed limiter when available</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: PEDESTRIANS -->
+    <div class="node" id="s8" style="left:100px;top:1600px">
+      <div class="slide-num">09</div>
+      <div class="eyebrow anim-item">Pedestrians</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Pedestrian safety rules</h2>
+      <p class="lead anim-item">A loaded pallet jack + operator can exceed 6,000 lbs. Pedestrian collisions are catastrophic.</p>
+      <div class="anim-item">
+        <div class="step"><div class="step-n">1</div><div><div class="step-title">Sound warning at every blind spot</div><div class="step-desc">Horn or verbal call before doors, corners, and aisle intersections</div></div></div>
+        <div class="step"><div class="step-n">2</div><div><div class="step-title">Yield to pedestrians — always</div><div class="step-desc">Pedestrians have right of way. Stop and wait. Never assume they will move.</div></div></div>
+        <div class="step"><div class="step-n">3</div><div><div class="step-title">Use designated equipment routes</div><div class="step-desc">Never shortcut through pedestrian-only areas, even if faster</div></div></div>
+        <div class="step"><div class="step-n">4</div><div><div class="step-title">Maintain 3-foot minimum clearance</div><div class="step-desc">From people, walls, racking, and obstacles at all times</div></div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: HAZARDS -->
+    <div class="node" id="s9" style="left:1100px;top:1600px">
+      <div class="slide-num">10</div>
+      <div class="eyebrow anim-item">Hazards</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Common workplace hazards</h2>
+      <div class="hazards anim-item">
+        <div class="haz"><div class="haz-icon">💧</div><div class="haz-title">Wet floors</div><div class="haz-desc">Drastically reduce traction. Reroute or wait.</div></div>
+        <div class="haz"><div class="haz-icon">⚡</div><div class="haz-title">Electrical cords</div><div class="haz-desc">Trip hazard + shock risk. Route overhead.</div></div>
+        <div class="haz"><div class="haz-icon">🌫️</div><div class="haz-title">Poor visibility</div><div class="haz-desc">Use mirrors, slow down, horn frequently.</div></div>
+        <div class="haz"><div class="haz-icon">📦</div><div class="haz-title">Unstable loads</div><div class="haz-desc">Wrap and secure before any movement.</div></div>
+        <div class="haz"><div class="haz-icon">🔧</div><div class="haz-title">Damaged floors</div><div class="haz-desc">Cracks catch forks. Report and reroute.</div></div>
+        <div class="haz"><div class="haz-icon">🌡️</div><div class="haz-title">Cold storage</div><div class="haz-desc">Ice on floor, low visibility. Extra caution.</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: TIP-OVER -->
+    <div class="node" id="s10" style="left:2100px;top:1600px">
+      <div class="slide-num">11</div>
+      <div class="eyebrow anim-item" style="color:#ef4444">Emergency</div>
+      <div class="accent-line anim-item" style="background:var(--red)"></div>
+      <h2 class="title anim-item">If a tip-over occurs</h2>
+      <div class="rule anim-item" style="border-color:var(--red);background:rgba(239,68,68,0.05)"><div class="rule-text" style="color:#fca5a5">Never jump off a tipping pallet jack</div><div class="rule-sub">Jumping increases injury risk by 300% — stay with the equipment</div></div>
+      <div class="anim-item" style="margin-top:14px">
+        <div class="step"><div class="step-n" style="border-color:var(--red);color:#fca5a5">1</div><div><div class="step-title">Hold on firmly to the handle</div><div class="step-desc">Keep both hands on steering handle and brace</div></div></div>
+        <div class="step"><div class="step-n" style="border-color:var(--red);color:#fca5a5">2</div><div><div class="step-title">Lean away from direction of fall</div><div class="step-desc">Shift your weight to the opposite side</div></div></div>
+        <div class="step"><div class="step-n" style="border-color:var(--red);color:#fca5a5">3</div><div><div class="step-title">Call for help immediately</div><div class="step-desc">Do not self-rescue a pinned load — get trained assistance</div></div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: DO & DONT -->
+    <div class="node" id="s11" style="left:3100px;top:1600px">
+      <div class="slide-num">12</div>
+      <div class="eyebrow anim-item">Golden rules</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Do & don't — at a glance</h2>
+      <div class="two-col anim-item" style="margin-top:16px">
+        <div>
+          <span class="col-head col-do">Always do</span>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Inspect before every shift</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Wear full PPE at all times</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Travel at safe walking speed</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Keep load low while traveling</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Sound horn at blind corners</div></div>
+          <div class="li"><div class="dot dot-green"></div><div class="li-text">Report defects immediately</div></div>
+        </div>
+        <div>
+          <span class="col-head col-dont">Never do</span>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Exceed rated load capacity</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Operate without training</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Carry passengers on equipment</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Use phone while operating</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Turn on slopes with load</div></div>
+          <div class="li"><div class="dot dot-red"></div><div class="li-text">Use damaged equipment</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: PARKING -->
+    <div class="node" id="s12" style="left:100px;top:2300px">
+      <div class="slide-num">13</div>
+      <div class="eyebrow anim-item">End of shift</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Parking & end-of-shift procedures</h2>
+      <div class="anim-item">
+        <div class="step"><div class="step-n">1</div><div><div class="step-title">Lower forks completely to the floor</div><div class="step-desc">Never leave forks raised — falling hazard for pedestrians</div></div></div>
+        <div class="step"><div class="step-n">2</div><div><div class="step-title">Park in designated area only</div><div class="step-desc">Never block emergency exits, fire equipment, or walkways</div></div></div>
+        <div class="step"><div class="step-n">3</div><div><div class="step-title">Engage the brake / parking lock</div><div class="step-desc">Electric: turn off and remove key. Manual: set brake.</div></div></div>
+        <div class="step"><div class="step-n">4</div><div><div class="step-title">Charge electric models after every shift</div><div class="step-desc">Follow the charging protocol — partial charging shortens battery life</div></div></div>
+        <div class="step"><div class="step-n">5</div><div><div class="step-title">Report any incidents or damage</div><div class="step-desc">Even near-misses must be logged — they prevent future accidents</div></div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14: OSHA -->
+    <div class="node" id="s13" style="left:1100px;top:2300px">
+      <div class="slide-num">14</div>
+      <div class="eyebrow anim-item">Legal & compliance</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">OSHA requirements</h2>
+      <div class="cards anim-item">
+        <div class="card warning"><div class="card-title">Training required</div><div class="card-body">OSHA 29 CFR 1910.178 — all operators must be trained and certified before operating any powered industrial truck.</div></div>
+        <div class="card warning"><div class="card-title">Re-evaluation every 3 years</div><div class="card-body">Also required after any accident, near-miss, or observed unsafe operation — no exceptions.</div></div>
+        <div class="card danger"><div class="card-title">Penalties up to $156,259</div><div class="card-body">Willful OSHA violations can reach $156,259 per violation. Standard violations up to $15,625 each.</div></div>
+        <div class="card success"><div class="card-title">Documentation required</div><div class="card-body">Keep training records, daily inspection logs, and incident reports. Must be available for OSHA inspection.</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 15: QUIZ PROMPT -->
+    <div class="node" id="s14" style="left:2100px;top:2300px">
+      <div class="slide-num">15</div>
+      <div class="eyebrow anim-item">Knowledge check</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item">Test your knowledge</h2>
+      <p class="lead anim-item">Before returning to the floor, every operator must demonstrate understanding of these core principles.</p>
+      <div class="cards anim-item">
+        <div class="card" style="grid-column:1/-1;text-align:center;padding:28px">
+          <div style="font-size:36px;margin-bottom:12px">🎯</div>
+          <div class="card-title" style="font-size:16px;margin-bottom:10px">Interactive Safety Quiz</div>
+          <div class="card-body" style="margin-bottom:16px">8 rounds combining quiz questions and real workplace scenarios. Timer-based scoring.</div>
+          <a href="https://davidchavur1-gif.github.io/pallet-jack-quiz" target="_blank" style="display:inline-block;background:var(--blue);color:#fff;padding:10px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.2s">Open Quiz →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 16: SUMMARY -->
+    <div class="node" id="s15" style="left:3100px;top:2300px;background:linear-gradient(135deg,#0d2347 0%,#0f3060 100%)">
+      <div class="slide-num">16</div>
+      <div class="eyebrow anim-item">Summary</div>
+      <div class="accent-line anim-item"></div>
+      <h2 class="title anim-item" style="font-size:34px;margin-bottom:20px">Key takeaways</h2>
+      <div class="anim-item">
+        <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Inspect</strong> the equipment before every single shift</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Never exceed</strong> the rated load capacity — ever</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Pedestrians first</strong> — yield, warn, use designated routes</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>PPE mandatory</strong> — hard hat, vest, boots, gloves, glasses</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Load uphill</strong> on slopes — operator walks downhill always</div></div>
+        <div class="li"><div class="dot dot-green"></div><div class="li-text"><strong>Report</strong> every defect, incident, and near-miss immediately</div></div>
+      </div>
+      <div class="div"></div>
+      <p class="anim-item" style="font-size:16px;color:#22c55e;font-weight:600;line-height:1.5">Safety is not a rule — it is a habit.<br>Every trip. Every shift. Every operator.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- NAV -->
+<div id="ui">
+  <button class="nav-btn" id="prev-btn" onclick="prev()" disabled>← Prev</button>
+  <div id="slide-dots"></div>
+  <span id="counter">1 / 16</span>
+  <button class="nav-btn" id="next-btn" onclick="next()">Next →</button>
+</div>
+
+<script>
+const COLS=4,ROWS=4;
+const nodes=document.querySelectorAll('.node');
+const total=nodes.length;
+let cur=0;
+
+const positions=Array.from(nodes).map(n=>({
+  x:parseInt(n.style.left),
+  y:parseInt(n.style.top)
+}));
+
+const dotNav=document.getElementById('slide-dots');
+nodes.forEach((_,i)=>{
+  const d=document.createElement('button');
+  d.className='sdot'+(i===0?' active':'');
+  d.onclick=()=>goTo(i);
+  dotNav.appendChild(d);
+});
+
+function getViewport(){return{w:window.innerWidth,h:window.innerHeight-56};}
+
+function zoomTo(idx){
+  const vp=getViewport();
+  const pos=positions[idx];
+  const nodeW=860,nodeH=520;
+  const scale=Math.min(vp.w/(nodeW+80),vp.h/(nodeH+80));
+  const tx=vp.w/2-(pos.x+nodeW/2)*scale;
+  const ty=vp.h/2-(pos.y+nodeH/2)*scale;
+  document.getElementById('world').style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;
+  nodes.forEach((n,i)=>n.classList.toggle('visible',i===idx));
+  document.getElementById('prev-btn').disabled=idx===0;
+  document.getElementById('next-btn').disabled=idx===total-1;
+  document.getElementById('counter').textContent=(idx+1)+' / '+total;
+  document.getElementById('prog-bar').style.width=((idx+1)/total*100)+'%';
+  document.querySelectorAll('.sdot').forEach((d,i)=>d.className='sdot'+(i===idx?' active':''));
+}
+
+function goTo(i){cur=i;zoomTo(i);}
+function next(){if(cur<total-1){cur++;zoomTo(cur);}}
+function prev(){if(cur>0){cur--;zoomTo(cur);}}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')next();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')prev();
+});
+
+window.addEventListener('resize',()=>zoomTo(cur));
+zoomTo(0);
+</script>
+</body>
+</html>
