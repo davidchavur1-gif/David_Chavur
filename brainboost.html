@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainBoost — English Modal Verbs</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4ff;
+  --white:#ffffff;
+  --green:#58cc02;
+  --green2:#46a302;
+  --blue:#1cb0f6;
+  --blue2:#0b8fc2;
+  --purple:#ce82ff;
+  --purple2:#9b59b6;
+  --red:#ff4b4b;
+  --orange:#ff9600;
+  --yellow:#ffc800;
+  --pink:#ff6b9d;
+  --teal:#00b8a9;
+  --text:#3c3c3c;
+  --muted:#afafaf;
+  --border:#e5e5e5;
+  --shadow:0 4px 0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* CONFETTI */
+.cp{position:fixed;top:-14px;border-radius:3px;animation:cfall linear forwards;pointer-events:none;z-index:9999}
+@keyframes cfall{0%{transform:translateY(0) rotate(0) scale(1);opacity:1}100%{transform:translateY(110vh) rotate(800deg) scale(0.4);opacity:0}}
+
+/* NAV */
+nav{background:var(--white);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.nav-logo{font-size:22px;font-weight:900;color:var(--green);display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--blue)}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{padding:8px 16px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all 0.2s;font-family:'Nunito',sans-serif}
+.nav-tab:hover{background:var(--bg);color:var(--text)}
+.nav-tab.active{background:var(--green);color:white;box-shadow:0 3px 0 var(--green2)}
+.nav-xp{display:flex;align-items:center;gap:16px}
+.xp-pill{display:flex;align-items:center;gap:6px;background:var(--bg);border:2px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:800;color:var(--orange)}
+.streak-pill{display:flex;align-items:center;gap:6px;background:var(--bg);border:2px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:800;color:var(--red)}
+
+/* SCREENS */
+.screen{display:none;padding:24px;max-width:860px;margin:auto}
+.screen.active{display:block}
+
+/* HOME */
+.home-hero{text-align:center;padding:40px 0 32px}
+.home-hero h1{font-size:36px;font-weight:900;color:var(--text);margin-bottom:8px}
+.home-hero p{font-size:16px;color:var(--muted);margin-bottom:32px}
+.mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:32px}
+.mode-card{background:var(--white);border:2px solid var(--border);border-radius:20px;padding:28px 24px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative;overflow:hidden}
+.mode-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;border-radius:0 0 18px 18px}
+.mode-card.mc-flash::after{background:var(--blue)}
+.mode-card.mc-quiz::after{background:var(--green)}
+.mode-card.mc-map::after{background:var(--purple)}
+.mode-card.mc-prog::after{background:var(--orange)}
+.mode-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.1);border-color:transparent}
+.mode-icon{font-size:40px;margin-bottom:12px;display:block}
+.mode-title{font-size:16px;font-weight:900;color:var(--text);margin-bottom:4px}
+.mode-desc{font-size:13px;color:var(--muted)}
+
+/* PROGRESS BAR */
+.prog-bar-wrap{height:16px;background:var(--bg);border-radius:8px;overflow:hidden;border:2px solid var(--border);margin-bottom:8px}
+.prog-bar{height:100%;border-radius:6px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1)}
+.pb-green{background:linear-gradient(90deg,var(--green),#78e505)}
+.pb-blue{background:linear-gradient(90deg,var(--blue),#7dd8ff)}
+.pb-purple{background:linear-gradient(90deg,var(--purple),#e8b4ff)}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:var(--white);border:2px solid var(--border);border-radius:16px;padding:16px;text-align:center}
+.stat-n{font-size:28px;font-weight:900}
+.stat-l{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px}
+.sn-xp{color:var(--orange)}
+.sn-streak{color:var(--red)}
+.sn-done{color:var(--green)}
+.sn-acc{color:var(--blue)}
+
+/* FLASHCARDS */
+.flash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.flash-progress{flex:1;margin:0 16px}
+.back-btn{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:8px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text);transition:all 0.2s}
+.back-btn:hover{background:var(--border)}
+
+.card-area{perspective:1000px;margin-bottom:24px;cursor:pointer}
+.card-inner{position:relative;width:100%;height:260px;transition:transform 0.55s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d}
+.card-inner.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;inset:0;border-radius:24px;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.card-front{background:var(--white);border:3px solid var(--border);box-shadow:0 6px 0 var(--border)}
+.card-back{background:var(--blue);border:3px solid var(--blue2);box-shadow:0 6px 0 var(--blue2);transform:rotateY(180deg)}
+.card-tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:4px 12px;border-radius:20px}
+.ct-front{background:var(--bg);color:var(--muted)}
+.ct-back{background:rgba(255,255,255,0.2);color:rgba(255,255,255,0.9)}
+.card-word{font-size:38px;font-weight:900;color:var(--text);margin-bottom:8px}
+.card-back .card-word{color:#fff;font-size:28px}
+.card-hint{font-size:14px;color:var(--muted)}
+.card-back .card-hint{color:rgba(255,255,255,0.8);font-size:15px;line-height:1.6;max-width:400px}
+.card-example{font-size:13px;font-style:italic;color:rgba(255,255,255,0.7);margin-top:10px;max-width:420px;line-height:1.5}
+.flip-hint{text-align:center;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:16px}
+
+.flash-btns{display:flex;gap:12px;justify-content:center}
+.flash-btn{padding:14px 32px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;border:none;font-family:'Nunito',sans-serif;transition:all 0.15s}
+.fb-know{background:var(--green);color:white;box-shadow:0 4px 0 var(--green2)}
+.fb-know:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--green2)}
+.fb-know:active{transform:translateY(2px);box-shadow:0 2px 0 var(--green2)}
+.fb-again{background:var(--red);color:white;box-shadow:0 4px 0 #cc3c3c}
+.fb-again:hover{transform:translateY(-2px);box-shadow:0 6px 0 #cc3c3c}
+.fb-again:active{transform:translateY(2px);box-shadow:0 2px 0 #cc3c3c}
+.fb-skip{background:var(--bg);color:var(--muted);border:2px solid var(--border);box-shadow:0 4px 0 var(--border)}
+.fb-skip:hover{background:var(--border)}
+
+/* COLOR LEGEND */
+.color-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.leg-item{display:flex;align-items:center;gap:6px;background:var(--white);border:2px solid var(--border);border-radius:10px;padding:5px 12px;font-size:12px;font-weight:800}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* QUIZ */
+.quiz-question{background:var(--white);border:2px solid var(--border);border-radius:20px;padding:28px;margin-bottom:20px;box-shadow:0 4px 0 var(--border)}
+.quiz-tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--purple);margin-bottom:12px}
+.quiz-q{font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.4}
+.quiz-context{font-size:14px;color:var(--muted);font-style:italic;margin-bottom:4px}
+.quiz-opts{display:flex;flex-direction:column;gap:10px}
+.quiz-opt{padding:14px 20px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;border:2px solid var(--border);background:var(--white);text-align:left;font-family:'Nunito',sans-serif;transition:all 0.15s;color:var(--text)}
+.quiz-opt:hover:not(:disabled){border-color:var(--blue);background:#f0f8ff;transform:translateX(4px)}
+.quiz-opt:active:not(:disabled){transform:scale(0.98)}
+.quiz-opt.correct{background:#d7ffb8;border-color:var(--green);color:var(--green2);animation:popopt 0.3s ease}
+.quiz-opt.wrong{background:#ffd5d5;border-color:var(--red);color:#cc3c3c;animation:shakeopt 0.3s ease}
+.quiz-opt.reveal{background:#d7ffb8;border-color:var(--green);color:var(--green2);opacity:0.6}
+.quiz-opt:disabled{cursor:default}
+@keyframes popopt{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes shakeopt{0%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}100%{transform:translateX(0)}}
+.quiz-feedback{padding:14px 18px;border-radius:12px;font-size:14px;font-weight:700;margin-top:12px;display:none;line-height:1.5}
+.quiz-feedback.show{display:block}
+.qf-ok{background:#d7ffb8;color:var(--green2);border-left:4px solid var(--green)}
+.qf-bad{background:#ffd5d5;color:#cc3c3c;border-left:4px solid var(--red)}
+.next-btn{width:100%;padding:14px;border-radius:14px;font-size:16px;font-weight:800;background:var(--green);color:white;border:none;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 0 var(--green2);transition:all 0.15s;margin-top:12px}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--green2)}
+.next-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--green2)}
+
+/* TIMER BAR */
+.timer-wrap{height:12px;background:var(--bg);border-radius:6px;overflow:hidden;border:2px solid var(--border);margin-bottom:16px}
+#tbar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),#78e505);transition:width 0.1s linear}
+#tbar.warn{background:linear-gradient(90deg,var(--orange),var(--yellow))}
+#tbar.danger{background:linear-gradient(90deg,var(--red),#ff8080);animation:tpulse 0.4s infinite alternate}
+@keyframes tpulse{from{opacity:1}to{opacity:0.5}}
+
+/* STREAK DISPLAY */
+#streak-display{text-align:center;font-size:20px;font-weight:900;color:var(--orange);min-height:32px;margin-bottom:8px;transition:transform 0.2s}
+#streak-display.pop{animation:spop 0.4s ease}
+@keyframes spop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+
+/* MIND MAP */
+.mindmap-wrap{background:var(--white);border:2px solid var(--border);border-radius:20px;padding:20px;overflow:auto;margin-bottom:20px}
+#mindmap-svg{width:100%;min-height:500px;cursor:grab}
+#mindmap-svg:active{cursor:grabbing}
+.node-circle{cursor:pointer;transition:all 0.2s}
+.node-circle:hover{filter:brightness(1.1)}
+
+/* PROGRESS SCREEN */
+.progress-section{margin-bottom:28px}
+.progress-title{font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px}
+.prog-item{background:var(--white);border:2px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px}
+.prog-item-icon{font-size:24px;width:44px;text-align:center;flex-shrink:0}
+.prog-item-info{flex:1}
+.prog-item-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px}
+.prog-item-bar{height:10px;background:var(--bg);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
+.prog-item-fill{height:100%;border-radius:4px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1)}
+.prog-item-pct{font-size:14px;font-weight:900;color:var(--muted);flex-shrink:0;width:40px;text-align:right}
+
+.achievement-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.achievement{background:var(--white);border:2px solid var(--border);border-radius:14px;padding:16px;text-align:center;transition:all 0.2s}
+.achievement.earned{border-color:var(--yellow);background:#fffbeb}
+.achievement.earned:hover{transform:translateY(-3px)}
+.ach-icon{font-size:30px;margin-bottom:6px;filter:grayscale(1);opacity:0.3}
+.achievement.earned .ach-icon{filter:none;opacity:1;animation:achpop 0.5s ease}
+@keyframes achpop{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.ach-name{font-size:12px;font-weight:800;color:var(--muted)}
+.achievement.earned .ach-name{color:var(--text)}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;font-size:14px;font-weight:800;padding:12px 24px;border-radius:24px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:600;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* LEVEL BADGE */
+.level-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--yellow),var(--orange));border-radius:20px;padding:8px 20px;font-size:14px;font-weight:900;color:white;box-shadow:0 4px 0 #cc7a00;margin-bottom:24px}
+
+@media(max-width:600px){
+  .mode-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .achievement-grid{grid-template-columns:1fr 1fr}
+  nav{padding:0 16px}
+  .nav-tabs{gap:2px}
+  .nav-tab{padding:6px 10px;font-size:12px}
+  .screen{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">🧠 Brain<span>Boost</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showScreen('home')">🏠 Inicio</button>
+    <button class="nav-tab" onclick="showScreen('flash')">🃏 Flashcards</button>
+    <button class="nav-tab" onclick="showScreen('quiz')">⚡ Quiz</button>
+    <button class="nav-tab" onclick="showScreen('map')">🗺 Mapa</button>
+    <button class="nav-tab" onclick="showScreen('progress')">📊 Progreso</button>
+  </div>
+  <div class="nav-xp">
+    <div class="xp-pill">⭐ <span id="xp-display">0</span> XP</div>
+    <div class="streak-pill">🔥 <span id="streak-nav">0</span></div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="home-hero">
+    <div class="level-badge">🎓 Nivel <span id="level-display">1</span> — English Modal Verbs</div>
+    <h1>¡Hola, David! 👋</h1>
+    <p>Elige cómo quieres estudiar hoy. Cada sesión suma XP y construye tu racha.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-n sn-xp" id="home-xp">0</div><div class="stat-l">⭐ XP Total</div></div>
+    <div class="stat-card"><div class="stat-n sn-streak" id="home-streak">0</div><div class="stat-l">🔥 Racha</div></div>
+    <div class="stat-card"><div class="stat-n sn-done" id="home-done">0</div><div class="stat-l">✅ Completadas</div></div>
+    <div class="stat-card"><div class="stat-n sn-acc" id="home-acc">—</div><div class="stat-l">🎯 Precisión</div></div>
+  </div>
+
+  <div class="mode-grid">
+    <div class="mode-card mc-flash" onclick="showScreen('flash')">
+      <span class="mode-icon">🃏</span>
+      <div class="mode-title">Flashcards</div>
+      <div class="mode-desc">Estudia los modal verbs con tarjetas que se voltean. Marca las que ya sabes.</div>
+    </div>
+    <div class="mode-card mc-quiz" onclick="showScreen('quiz')">
+      <span class="mode-icon">⚡</span>
+      <div class="mode-title">Quiz con racha</div>
+      <div class="mode-desc">Timer, sonidos y rachas de fuego. Gana XP según la velocidad.</div>
+    </div>
+    <div class="mode-card mc-map" onclick="showScreen('map')">
+      <span class="mode-icon">🗺️</span>
+      <div class="mode-title">Mapa mental</div>
+      <div class="mode-desc">Visualiza todos los modal verbs y sus usos de forma interactiva.</div>
+    </div>
+    <div class="mode-card mc-prog" onclick="showScreen('progress')">
+      <span class="mode-icon">📊</span>
+      <div class="mode-title">Mi progreso</div>
+      <div class="mode-desc">Ve tus estadísticas, logros y qué modal verbs dominas ya.</div>
+    </div>
+  </div>
+
+  <div class="color-legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#1cb0f6"></div>Posibilidad</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#58cc02"></div>Obligación</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#ff9600"></div>Permiso</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#ce82ff"></div>Pasado/Deducción</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#ff6b9d"></div>Consejo</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#00b8a9"></div>Habilidad</div>
+  </div>
+</div>
+
+<!-- FLASHCARDS -->
+<div class="screen" id="screen-flash">
+  <div class="flash-header">
+    <button class="back-btn" onclick="showScreen('home')">← Volver</button>
+    <div class="flash-progress" id="flash-prog-wrap">
+      <div class="prog-bar-wrap"><div class="prog-bar pb-blue" id="flash-prog" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700;margin-top:4px">
+        <span id="flash-count">Tarjeta 1 de 10</span>
+        <span id="flash-known">✅ 0 dominadas</span>
+      </div>
+    </div>
+    <button class="back-btn" onclick="shuffleCards()" style="background:#fff8e1;border-color:#ffc800">🔀</button>
+  </div>
+
+  <div class="card-area" onclick="flipCard()" id="card-area">
+    <div class="card-inner" id="card-inner">
+      <div class="card-face card-front">
+        <div class="card-tag ct-front">🃏 Click para ver</div>
+        <div class="card-word" id="cf-word">MUST</div>
+        <div class="card-hint" id="cf-type">Modal Verb</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-tag ct-back" id="cb-tag">Obligación</div>
+        <div class="card-word" id="cb-meaning">Obligación / Deducción</div>
+        <div class="card-hint" id="cb-es">Deber / Tener que</div>
+        <div class="card-example" id="cb-example">"You must wear a seatbelt." / "She must be tired."</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="flip-hint">👆 Click en la tarjeta para voltearla</p>
+
+  <div class="flash-btns" id="flash-btns" style="display:none">
+    <button class="flash-btn fb-again" onclick="markCard(false)">😅 Repasar</button>
+    <button class="flash-btn fb-skip" onclick="nextCard()">⏭ Saltar</button>
+    <button class="flash-btn fb-know" onclick="markCard(true)">✅ ¡Lo sé!</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="flash-header" style="margin-bottom:12px">
+    <button class="back-btn" onclick="showScreen('home')">← Volver</button>
+    <div class="flash-progress">
+      <div class="prog-bar-wrap"><div class="prog-bar pb-green" id="quiz-prog" style="width:0%"></div></div>
+    </div>
+    <div class="xp-pill">⭐ <span id="quiz-xp">0</span></div>
+  </div>
+  <div id="streak-display"></div>
+  <div class="timer-wrap"><div id="tbar" class="ok"></div></div>
+  <div id="quiz-area"></div>
+</div>
+
+<!-- MIND MAP -->
+<div class="screen" id="screen-map">
+  <button class="back-btn" onclick="showScreen('home')" style="margin-bottom:16px">← Volver</button>
+  <h2 style="font-size:20px;font-weight:900;margin-bottom:6px">🗺️ Mapa mental — Modal Verbs</h2>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Click en un nodo para ver ejemplos. Arrastra para mover el mapa.</p>
+  <div class="mindmap-wrap" id="mindmap-wrap">
+    <svg id="mindmap-svg" viewBox="0 0 800 540"></svg>
+  </div>
+  <div id="map-detail" style="display:none;background:var(--white);border:2px solid var(--border);border-radius:16px;padding:20px;margin-top:16px"></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="screen" id="screen-progress">
+  <button class="back-btn" onclick="showScreen('home')" style="margin-bottom:20px">← Volver</button>
+  <h2 style="font-size:24px;font-weight:900;margin-bottom:6px">📊 Mi progreso</h2>
+  <p style="font-size:14px;color:var(--muted);margin-bottom:24px">Aquí ves cuánto dominas cada modal verb</p>
+
+  <div class="progress-section" id="modal-progress-list"></div>
+
+  <div class="progress-section">
+    <div class="progress-title">🏆 Logros</div>
+    <div class="achievement-grid" id="achievements-grid"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── AUDIO ──
+const AC=new(window.AudioContext||window.webkitAudioContext)();
+function rac(){if(AC.state==='suspended')AC.resume();}
+function b(f,d,t='sine',v=0.2){rac();const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d);}
+const S={
+  flip:()=>{b(400,0.05,'sine',0.1);setTimeout(()=>b(600,0.08),60);},
+  know:()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>b(f,0.1),i*60));},
+  again:()=>{b(300,0.1,'sawtooth',0.15);setTimeout(()=>b(220,0.15,'sawtooth',0.12),110);},
+  correct:()=>{b(523,0.08);setTimeout(()=>b(659,0.08),80);setTimeout(()=>b(784,0.15),160);setTimeout(()=>b(1047,0.18),240);},
+  wrong:()=>{b(280,0.1,'sawtooth',0.2);setTimeout(()=>b(200,0.2,'sawtooth',0.15),110);},
+  tick:()=>b(900,0.03,'square',0.06),
+  nav:()=>b(500,0.05,'sine',0.08),
+  xp:()=>{b(660,0.06);setTimeout(()=>b(880,0.1),70);},
+  streak:()=>{b(880,0.06);setTimeout(()=>b(1100,0.08),70);},
+  win:()=>{[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>b(f,0.12,'sine',0.2),i*80));},
+};
+function playS(n){rac();S[n]&&S[n]();}
+
+// ── CONFETTI ──
+function confetti(n=50){
+  const c=['#58cc02','#1cb0f6','#ff9600','#ce82ff','#ff4b4b','#ffc800'];
+  for(let i=0;i<n;i++){const el=document.createElement('div');el.className='cp';const sz=8+Math.random()*8;el.style.cssText=`left:${Math.random()*100}vw;background:${c[~~(Math.random()*c.length)]};width:${sz}px;height:${sz}px;animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*0.4}s;border-radius:${Math.random()>0.5?'50%':'3px'}`;document.body.appendChild(el);setTimeout(()=>el.remove(),4000);}
+}
+
+// ── DATA ──
+const MODALS=[
+  {word:'CAN',color:'#00b8a9',type:'Habilidad / Posibilidad',es:'Poder (habilidad)',meaning:'Ability or possibility in the present',example:'"I can speak Spanish." / "It can be dangerous."',use:'ability',known:false},
+  {word:'COULD',color:'#00b8a9',type:'Habilidad pasada / Posibilidad',es:'Podría / Podía',meaning:'Past ability or polite possibility',example:'"I could swim when I was 5." / "Could you help me?"',use:'ability',known:false},
+  {word:'MUST',color:'#58cc02',type:'Obligación / Deducción',es:'Deber / Tener que',meaning:'Strong obligation or logical deduction',example:'"You must wear a seatbelt." / "She must be tired."',use:'obligation',known:false},
+  {word:'HAVE TO',color:'#58cc02',type:'Obligación externa',es:'Tener que (regla externa)',meaning:'External obligation or necessity',example:'"I have to work tomorrow." / "You have to follow the rules."',use:'obligation',known:false},
+  {word:'SHOULD',color:'#ff6b9d',type:'Consejo / Recomendación',es:'Debería',meaning:'Advice or recommendation',example:'"You should see a doctor." / "She should study more."',use:'advice',known:false},
+  {word:'OUGHT TO',color:'#ff6b9d',type:'Consejo / Deber moral',es:'Debería (más formal)',meaning:'Moral obligation or advice',example:'"You ought to apologize." / "We ought to help them."',use:'advice',known:false},
+  {word:'MAY',color:'#ff9600',type:'Permiso / Posibilidad',es:'Puede que / Se puede',meaning:'Permission or possibility (formal)',example:'"May I come in?" / "It may rain tomorrow."',use:'permission',known:false},
+  {word:'MIGHT',color:'#1cb0f6',type:'Posibilidad (dudosa)',es:'Podría / Quizás',meaning:'Weak possibility or uncertainty',example:'"I might go to the party." / "He might be wrong."',use:'possibility',known:false},
+  {word:"MUST HAVE",color:'#ce82ff',type:'Deducción pasada',es:'Debe haber',meaning:'Logical deduction about the past',example:'"She must have forgotten." / "They must have left already."',use:'past',known:false},
+  {word:"CAN'T HAVE",color:'#ce82ff',type:'Imposibilidad pasada',es:'No puede haber',meaning:'Impossibility about the past',example:'"He can\'t have done that!" / "It can\'t have been her."',use:'past',known:false},
+  {word:"MIGHT HAVE",color:'#ce82ff',type:'Posibilidad pasada',es:'Podría haber',meaning:'Past possibility (uncertain)',example:'"She might have missed the bus." / "I might have left it there."',use:'past',known:false},
+  {word:'WOULD',color:'#1cb0f6',type:'Condicional / Hábito pasado',es:'Haría / Solía',meaning:'Conditional or past habit',example:'"I would love to help." / "When I was young, I would walk to school."',use:'possibility',known:false},
+];
+
+// ── STATE ──
+let state={xp:0,streak:0,totalAnswered:0,totalCorrect:0,level:1};
+try{const s=localStorage.getItem('brainboost');if(s){state=Object.assign(state,JSON.parse(s));}}catch(e){}
+
+function saveState(){try{localStorage.setItem('brainboost',JSON.stringify(state));}catch(e){}}
+function addXP(n){state.xp+=n;state.level=Math.floor(state.xp/200)+1;updateUI();saveState();playS('xp');showToast('⭐ +'+n+' XP!');}
+function updateUI(){
+  document.getElementById('xp-display').textContent=state.xp;
+  document.getElementById('streak-nav').textContent=state.streak;
+  document.getElementById('home-xp').textContent=state.xp;
+  document.getElementById('home-streak').textContent=state.streak;
+  document.getElementById('home-done').textContent=state.totalCorrect;
+  document.getElementById('home-acc').textContent=state.totalAnswered?Math.round(state.totalCorrect/state.totalAnswered*100)+'%':'—';
+  document.getElementById('level-display').textContent=state.level;
+}
+
+// ── TOAST ──
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+
+// ── SCREENS ──
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  const tabs={home:0,flash:1,quiz:2,map:3,progress:4};
+  document.querySelectorAll('.nav-tab')[tabs[id]]?.classList.add('active');
+  playS('nav');
+  if(id==='flash')initFlash();
+  if(id==='quiz')initQuiz();
+  if(id==='map')initMap();
+  if(id==='progress')initProgress();
+}
+
+// ── FLASHCARDS ──
+let cards=[...MODALS];
+let cardIdx=0;
+let knownCount=0;
+let flipped=false;
+
+function initFlash(){
+  cards=[...MODALS];
+  cardIdx=0;knownCount=0;flipped=false;
+  showCard();
+}
+function shuffleCards(){cards.sort(()=>Math.random()-0.5);cardIdx=0;showCard();showToast('🔀 Mezcladas!');}
+function showCard(){
+  if(cardIdx>=cards.length){flashComplete();return;}
+  const c=cards[cardIdx];
+  document.getElementById('cf-word').textContent=c.word;
+  document.getElementById('cf-word').style.color=c.color;
+  document.getElementById('cf-type').textContent=c.type;
+  document.getElementById('cb-tag').textContent=c.type;
+  document.getElementById('cb-tag').style.background='rgba(255,255,255,0.2)';
+  document.getElementById('cb-meaning').textContent=c.meaning;
+  document.getElementById('cb-meaning').style.color='#fff';
+  document.getElementById('cb-es').textContent='🇪🇸 '+c.es;
+  document.getElementById('cb-example').textContent=c.example;
+  document.getElementById('card-inner').style.background='';
+  document.getElementById('card-area').querySelector('.card-back').style.background=c.color;
+  document.getElementById('card-area').querySelector('.card-back').style.borderColor=c.color;
+  document.getElementById('card-area').querySelector('.card-back').style.boxShadow='0 6px 0 '+c.color+'99';
+  flipped=false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  document.getElementById('flash-btns').style.display='none';
+  const pct=Math.round(cardIdx/cards.length*100);
+  document.getElementById('flash-prog').style.width=pct+'%';
+  document.getElementById('flash-count').textContent='Tarjeta '+(cardIdx+1)+' de '+cards.length;
+  document.getElementById('flash-known').textContent='✅ '+knownCount+' dominadas';
+}
+function flipCard(){
+  playS('flip');
+  flipped=!flipped;
+  document.getElementById('card-inner').classList.toggle('flipped',flipped);
+  document.getElementById('flash-btns').style.display=flipped?'flex':'none';
+}
+function markCard(know){
+  if(know){knownCount++;cards[cardIdx].known=true;playS('know');confetti(25);addXP(10);}
+  else{playS('again');}
+  nextCard();
+}
+function nextCard(){cardIdx++;showCard();}
+function flashComplete(){
+  document.getElementById('card-area').innerHTML=`<div style="background:var(--white);border:2px solid var(--border);border-radius:24px;padding:48px;text-align:center">
+    <div style="font-size:56px;margin-bottom:16px">🎉</div>
+    <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px">¡Mazo completado!</div>
+    <div style="font-size:16px;color:var(--muted);margin-bottom:24px">${knownCount} de ${cards.length} tarjetas dominadas</div>
+    <button onclick="initFlash()" style="background:var(--green);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 0 var(--green2)">🔄 Repetir</button>
+  </div>`;
+  document.getElementById('flash-btns').style.display='none';
+  confetti(60);playS('win');addXP(30);
+}
+
+// ── QUIZ ──
+const QUESTIONS=[
+  {q:"Complete: 'You ___ wear a helmet when cycling. It's the law.'",ctx:'Obligación legal',opts:['might','should','must','could'],correct:2,fb:'MUST = obligación fuerte (ley). SHOULD = consejo. Aquí es una ley, así que MUST.'},
+  {q:"Complete: 'She ___ be at home — her car is in the driveway.'",ctx:'Deducción lógica',opts:["can't",'must','should','might'],correct:1,fb:'MUST = deducción lógica positiva. Ves evidencia y concluyes algo casi seguro.'},
+  {q:"Complete: 'I ___ swim when I was 5 years old.'",ctx:'Habilidad en el pasado',opts:['can','must','could','should'],correct:2,fb:'COULD = habilidad en el pasado. CAN = habilidad presente. Pasado → COULD.'},
+  {q:"'___ I open the window? It's very hot.'",ctx:'Pedir permiso (formal)',opts:['Should','Must','May','Would'],correct:2,fb:'MAY = permiso formal y educado. CAN también funciona pero MAY es más formal.'},
+  {q:"Complete: 'He ___ have left already — the door is locked.'",ctx:'Deducción sobre el pasado',opts:['might have','must have','can have','should have'],correct:1,fb:'MUST HAVE = deducción lógica sobre el pasado. Evidencia clara → casi seguro.'},
+  {q:"'You ___ drink and drive. It is illegal and dangerous.'",ctx:'Prohibición',opts:["mustn't",'might not','couldn\'t','shouldn\'t'],correct:0,fb:"MUSTN'T = prohibición fuerte. No se puede hacer. SHOULDN'T = consejo negativo (no recomendación)."},
+  {q:"Complete: 'I'm not sure but she ___ be in the office tomorrow.'",ctx:'Posibilidad incierta',opts:['must','will','might','should'],correct:2,fb:'MIGHT = posibilidad incierta/débil. Cuando no estás seguro, usas MIGHT o MAY.'},
+  {q:"'You ___ see a doctor about that cough.' (advice)",ctx:'Consejo / Recomendación',opts:['must','should','may','could'],correct:1,fb:'SHOULD = consejo o recomendación. Es la forma más común de dar consejos en inglés.'},
+  {q:"'He ___ have stolen it — he was with me all night!'",ctx:'Imposibilidad en el pasado',opts:["can't have",'must have','might have','should have'],correct:0,fb:"CAN'T HAVE = imposibilidad en el pasado. Sabes con certeza que NO pasó."},
+  {q:"Complete: '___ you help me with this? (polite request)'",ctx:'Petición educada',opts:['Should','Must','Could','Might'],correct:2,fb:'COULD = petición educada/cortés. WOULD también funciona. MUST suena demasiado fuerte para una petición.'},
+];
+
+let qIdx=0,qScore=0,qStreak=0,qTimer=null,qTv=100,qAnswered=0,qCorrect=0;
+
+function initQuiz(){
+  const qs=[...QUESTIONS].sort(()=>Math.random()-0.5);
+  window._qs=qs;qIdx=0;qScore=0;qStreak=0;qAnswered=0;qCorrect=0;
+  document.getElementById('quiz-xp').textContent=0;
+  document.getElementById('streak-display').textContent='';
+  showQuestion();
+}
+
+function showQuestion(){
+  if(qIdx>=window._qs.length){quizComplete();return;}
+  const q=window._qs[qIdx];
+  const pct=Math.round(qIdx/window._qs.length*100);
+  document.getElementById('quiz-prog').style.width=pct+'%';
+
+  document.getElementById('quiz-area').innerHTML=`
+    <div class="quiz-question">
+      <div class="quiz-tag">❓ Pregunta ${qIdx+1} de ${window._qs.length}</div>
+      <div class="quiz-q">${q.q}</div>
+      <div class="quiz-context">💡 ${q.ctx}</div>
+    </div>
+    <div class="quiz-opts" id="qopts">
+      ${q.opts.map((o,i)=>`<button class="quiz-opt" onclick="answerQ(${i})">${o}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="qfb"></div>
+    <button class="next-btn" id="qnxt" onclick="nextQ()" style="display:none">Siguiente →</button>`;
+
+  startQTimer();
+}
+
+function startQTimer(){
+  clearInterval(qTimer);qTv=100;
+  const bar=document.getElementById('tbar');
+  bar.style.width='100%';bar.className='ok';
+  let ticks=0;
+  qTimer=setInterval(()=>{
+    qTv-=0.5;ticks++;bar.style.width=qTv+'%';
+    if(qTv<50&&qTv>=25){bar.className='warn';}
+    if(qTv<25){bar.className='danger';if(ticks%6===0)playS('tick');}
+    if(qTv<=0){clearInterval(qTimer);timeUpQ();}
+  },100);
+}
+
+function timeUpQ(){
+  const q=window._qs[qIdx];
+  document.querySelectorAll('.quiz-opt').forEach((b,i)=>{b.disabled=true;if(i===q.correct)b.classList.add('reveal');});
+  playS('wrong');qStreak=0;updateStreak();
+  const fb=document.getElementById('qfb');
+  fb.innerHTML='⏱ ¡Tiempo! '+q.fb;fb.className='quiz-feedback qf-bad show';
+  document.getElementById('qnxt').style.display='block';
+}
+
+function answerQ(chosen){
+  clearInterval(qTimer);
+  const q=window._qs[qIdx];
+  qAnswered++;state.totalAnswered++;
+  document.querySelectorAll('.quiz-opt').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.correct)b.classList.add('correct');
+    else if(i===chosen&&chosen!==q.correct)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('qfb');
+  if(chosen===q.correct){
+    const pts=Math.round(30+qTv*0.7);
+    qScore+=pts;qStreak++;qCorrect++;state.totalCorrect++;
+    playS('correct');
+    if(qStreak>=3)confetti(25);
+    updateStreak();
+    document.getElementById('quiz-xp').textContent=qScore;
+    fb.innerHTML=`✅ ¡Correcto! +${pts} XP — ${q.fb}`;
+    fb.className='quiz-feedback qf-ok show';
+  } else {
+    qStreak=0;playS('wrong');updateStreak();
+    fb.innerHTML=`❌ Incorrecto. ${q.fb}`;
+    fb.className='quiz-feedback qf-bad show';
+  }
+  document.getElementById('qnxt').style.display='block';
+}
+
+function updateStreak(){
+  const el=document.getElementById('streak-display');
+  if(qStreak>=2){
+    el.textContent='🔥'.repeat(Math.min(qStreak,5))+' Racha x'+qStreak+'!';
+    el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
+    state.streak=Math.max(state.streak,qStreak);
+    if(qStreak>=2)playS('streak');
+  } else el.textContent='';
+}
+
+function nextQ(){qIdx++;showQuestion();}
+
+function quizComplete(){
+  const pct=Math.round(qCorrect/window._qs.length*100);
+  document.getElementById('quiz-area').innerHTML=`
+    <div style="background:var(--white);border:2px solid var(--border);border-radius:24px;padding:40px;text-align:center">
+      <div style="font-size:56px;margin-bottom:16px">${pct>=80?'🏆':pct>=50?'👍':'📚'}</div>
+      <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px">${pct>=80?'¡Excelente!':pct>=50?'¡Bien hecho!':'¡Sigue practicando!'}</div>
+      <div style="font-size:16px;color:var(--muted);margin-bottom:20px">${qCorrect}/${window._qs.length} correctas · ${pct}% precisión · ${qScore} XP</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px">
+        <div style="background:var(--bg);border-radius:12px;padding:14px;font-size:22px;font-weight:900;color:var(--orange)">${qScore}<div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:2px">XP ganado</div></div>
+        <div style="background:var(--bg);border-radius:12px;padding:14px;font-size:22px;font-weight:900;color:var(--green)">${qCorrect}/${window._qs.length}<div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:2px">Correctas</div></div>
+        <div style="background:var(--bg);border-radius:12px;padding:14px;font-size:22px;font-weight:900;color:var(--blue)">${pct}%<div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:2px">Precisión</div></div>
+      </div>
+      <button onclick="initQuiz()" style="background:var(--green);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 0 var(--green2)">🔄 Repetir quiz</button>
+    </div>`;
+  if(pct>=80){confetti(80);playS('win');}
+  addXP(qScore);
+  saveState();
+  updateProgress();
+}
+
+// ── MIND MAP ──
+const MAP_NODES=[
+  {id:'root',label:'MODAL\nVERBS',x:400,y:270,r:52,color:'#3c3c3c',textColor:'#fff',children:['ability','obligation','permission','possibility','advice','past']},
+  {id:'ability',label:'Habilidad\n(CAN/COULD)',x:160,y:120,r:44,color:'#00b8a9',textColor:'#fff',children:['can','could']},
+  {id:'obligation',label:'Obligación\n(MUST)',x:400,y:60,r:44,color:'#58cc02',textColor:'#fff',children:['must','haveto']},
+  {id:'permission',label:'Permiso\n(MAY)',x:640,y:120,r:44,color:'#ff9600',textColor:'#fff',children:['may']},
+  {id:'possibility',label:'Posibilidad\n(MIGHT)',x:680,y:340,r:44,color:'#1cb0f6',textColor:'#fff',children:['might','would']},
+  {id:'advice',label:'Consejo\n(SHOULD)',x:400,y:460,r:44,color:'#ff6b9d',textColor:'#fff',children:['should','oughtto']},
+  {id:'past',label:'Pasado\n(MUST HAVE)',x:140,y:380,r:44,color:'#ce82ff',textColor:'#fff',children:['musthave','canthave','mighthave']},
+  {id:'can',label:'CAN',x:60,y:60,r:30,color:'#00d4c4',textColor:'#fff',leaf:true,modal:'CAN'},
+  {id:'could',label:'COULD',x:200,y:40,r:30,color:'#00d4c4',textColor:'#fff',leaf:true,modal:'COULD'},
+  {id:'must',label:'MUST',x:320,y:20,r:30,color:'#78e505',textColor:'#fff',leaf:true,modal:'MUST'},
+  {id:'haveto',label:'HAVE TO',x:480,y:20,r:30,color:'#78e505',textColor:'#fff',leaf:true,modal:'HAVE TO'},
+  {id:'may',label:'MAY',x:730,y:60,r:30,color:'#ffb830',textColor:'#fff',leaf:true,modal:'MAY'},
+  {id:'might',label:'MIGHT',x:760,y:260,r:30,color:'#4dcfff',textColor:'#fff',leaf:true,modal:'MIGHT'},
+  {id:'would',label:'WOULD',x:760,y:420,r:30,color:'#4dcfff',textColor:'#fff',leaf:true,modal:'WOULD'},
+  {id:'should',label:'SHOULD',x:320,y:510,r:30,color:'#ff8fb5',textColor:'#fff',leaf:true,modal:'SHOULD'},
+  {id:'oughtto',label:'OUGHT TO',x:480,y:510,r:30,color:'#ff8fb5',textColor:'#fff',leaf:true,modal:'OUGHT TO'},
+  {id:'musthave',label:'MUST\nHAVE',x:60,y:440,r:30,color:'#da9fff',textColor:'#fff',leaf:true,modal:'MUST HAVE'},
+  {id:'canthave',label:"CAN'T\nHAVE",x:60,y:330,r:30,color:'#da9fff',textColor:'#fff',leaf:true,modal:"CAN'T HAVE"},
+  {id:'mighthave',label:'MIGHT\nHAVE',x:160,y:490,r:30,color:'#da9fff',textColor:'#fff',leaf:true,modal:'MIGHT HAVE'},
+];
+
+function initMap(){
+  const svg=document.getElementById('mindmap-svg');
+  svg.innerHTML='';
+  // Draw edges
+  MAP_NODES.forEach(n=>{
+    if(n.children){n.children.forEach(cid=>{
+      const child=MAP_NODES.find(x=>x.id===cid);
+      if(!child)return;
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',n.x);line.setAttribute('y1',n.y);
+      line.setAttribute('x2',child.x);line.setAttribute('y2',child.y);
+      line.setAttribute('stroke',n.color);line.setAttribute('stroke-width','2.5');
+      line.setAttribute('stroke-opacity','0.4');
+      svg.appendChild(line);
+    });}
+  });
+  // Draw nodes
+  MAP_NODES.forEach(n=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform',`translate(${n.x},${n.y})`);
+    g.style.cursor='pointer';
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('r',n.r);c.setAttribute('fill',n.color);
+    c.setAttribute('stroke','white');c.setAttribute('stroke-width','3');
+    if(n.leaf){c.setAttribute('stroke-opacity','0.6');}
+    g.appendChild(c);
+    const lines=n.label.split('\n');
+    lines.forEach((l,i)=>{
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('dominant-baseline','middle');
+      t.setAttribute('fill',n.textColor);
+      t.setAttribute('font-family','Nunito,sans-serif');
+      t.setAttribute('font-weight','900');
+      t.setAttribute('font-size',n.leaf?'11':'12');
+      const offset=(lines.length>1)?((i-0.5)*14):0;
+      t.setAttribute('y',offset);
+      t.textContent=l;g.appendChild(t);
+    });
+    g.addEventListener('click',()=>showMapDetail(n));
+    g.addEventListener('mouseenter',()=>{c.setAttribute('stroke-width','5');c.setAttribute('stroke','white');});
+    g.addEventListener('mouseleave',()=>{c.setAttribute('stroke-width','3');});
+    svg.appendChild(g);
+  });
+}
+
+function showMapDetail(n){
+  playS('flip');
+  const detail=document.getElementById('map-detail');
+  if(n.leaf&&n.modal){
+    const m=MODALS.find(x=>x.word===n.modal);
+    if(m){
+      detail.style.display='block';
+      detail.innerHTML=`
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+          <div style="width:48px;height:48px;border-radius:50%;background:${m.color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:white;flex-shrink:0">${m.word.split(' ')[0]}</div>
+          <div><div style="font-size:20px;font-weight:900;color:${m.color}">${m.word}</div><div style="font-size:13px;color:var(--muted)">${m.type}</div></div>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px">🇬🇧 Significado</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${m.meaning}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px">🇪🇸 En español</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${m.es}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:14px">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px">💬 Ejemplos</div>
+          <div style="font-size:14px;font-style:italic;color:var(--text);line-height:1.6">${m.example}</div>
+        </div>`;
+      detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+  } else {
+    detail.style.display='none';
+  }
+}
+
+// ── PROGRESS ──
+const ACHIEVEMENTS=[
+  {id:'first',icon:'🎯',name:'Primera respuesta',cond:()=>state.totalAnswered>=1},
+  {id:'streak3',icon:'🔥',name:'Racha x3',cond:()=>state.streak>=3},
+  {id:'streak5',icon:'💥',name:'Racha x5',cond:()=>state.streak>=5},
+  {id:'xp100',icon:'⭐',name:'100 XP',cond:()=>state.xp>=100},
+  {id:'xp500',icon:'🌟',name:'500 XP',cond:()=>state.xp>=500},
+  {id:'level5',icon:'🏆',name:'Nivel 5',cond:()=>state.level>=5},
+  {id:'acc80',icon:'🎯',name:'80% precisión',cond:()=>state.totalAnswered>=5&&state.totalCorrect/state.totalAnswered>=0.8},
+  {id:'flash',icon:'🃏',name:'Mazo completo',cond:()=>MODALS.filter(m=>m.known).length>=6},
+  {id:'allknown',icon:'🧠',name:'Todas dominadas',cond:()=>MODALS.every(m=>m.known)},
+];
+
+function initProgress(){
+  const list=document.getElementById('modal-progress-list');
+  const colorMap={ability:'#00b8a9',obligation:'#58cc02',permission:'#ff9600',possibility:'#1cb0f6',advice:'#ff6b9d',past:'#ce82ff'};
+  const groups={ability:[],obligation:[],permission:[],possibility:[],advice:[],past:[]};
+  MODALS.forEach(m=>groups[m.use]?.push(m));
+  const labels={ability:'Habilidad',obligation:'Obligación',permission:'Permiso',possibility:'Posibilidad',advice:'Consejo',past:'Pasado/Deducción'};
+  list.innerHTML='<div class="progress-title">📚 Modal verbs por categoría</div>'+
+    Object.entries(groups).map(([use,ms])=>{
+      const pct=ms.length?Math.round(ms.filter(m=>m.known).length/ms.length*100):0;
+      return `<div class="prog-item">
+        <div class="prog-item-icon">📖</div>
+        <div class="prog-item-info">
+          <div class="prog-item-name" style="color:${colorMap[use]}">${labels[use]}</div>
+          <div class="prog-item-bar"><div class="prog-item-fill" style="width:${pct}%;background:${colorMap[use]}"></div></div>
+        </div>
+        <div class="prog-item-pct" style="color:${colorMap[use]}">${pct}%</div>
+      </div>`;
+    }).join('');
+
+  const achGrid=document.getElementById('achievements-grid');
+  achGrid.innerHTML=ACHIEVEMENTS.map(a=>`
+    <div class="achievement ${a.cond()?'earned':''}">
+      <div class="ach-icon">${a.icon}</div>
+      <div class="ach-name">${a.name}</div>
+    </div>`).join('');
+}
+
+function updateProgress(){
+  initProgress();
+  checkAchievements();
+}
+
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(a.cond()){const key='ach_'+a.id;if(!localStorage.getItem(key)){localStorage.setItem(key,'1');showToast(a.icon+' ¡Logro desbloqueado: '+a.name+'!');confetti(30);}}
+  });
+}
+
+// Init
+updateUI();
+document.addEventListener('click',rac,{once:true});
+</script>
+</body>
+</html>
