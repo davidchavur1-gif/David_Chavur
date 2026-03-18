@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B2 English — Unit 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c1:#ff6b6b;--c2:#ffd93d;--c3:#6bcb77;--c4:#4d96ff;
+  --c5:#ff6bdf;--c6:#ff9a3c;--c7:#a8ff78;--c8:#78d6ff;
+  --dark:#1a1a2e;--darker:#12122a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--dark);color:white;min-height:100vh;overflow-x:hidden;}
+
+/* PARTICLES */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.particle{position:absolute;border-radius:50%;opacity:0.12;animation:float linear infinite;}
+@keyframes float{from{transform:translateY(100vh) rotate(0deg);opacity:0;}10%{opacity:.12;}90%{opacity:.12;}to{transform:translateY(-100px) rotate(720deg);opacity:0;}}
+
+/* HEADER */
+header{position:relative;z-index:10;background:linear-gradient(135deg,#1a1a2e,#16213e);border-bottom:3px solid rgba(255,255,255,.1);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.logo{font-family:'Fredoka One',cursive;font-size:24px;background:linear-gradient(135deg,var(--c1),var(--c2),var(--c3),var(--c4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.badge{background:linear-gradient(135deg,var(--c5),var(--c4));padding:4px 14px;border-radius:99px;font-weight:800;font-size:12px;color:white;}
+.xp-wrap{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.xp-num{font-weight:900;font-size:16px;color:var(--c2);font-family:'Fredoka One',cursive;}
+.xp-bar{width:110px;height:12px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--c2),var(--c6));border-radius:99px;transition:width .5s cubic-bezier(.34,1.56,.64,1);width:0%;}
+.lives{font-size:18px;letter-spacing:2px;}
+
+/* TABS */
+.tabs{position:relative;z-index:10;display:flex;gap:5px;padding:16px 20px 0;max-width:900px;margin:0 auto;flex-wrap:wrap;}
+.tab{padding:9px 18px;border-radius:12px 12px 0 0;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;border:none;transition:all .2s;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);}
+.tab.active{background:#fff;color:var(--dark);}
+.tab:hover:not(.active){background:rgba(255,255,255,.15);color:white;}
+
+/* MAIN */
+main{position:relative;z-index:10;max-width:900px;margin:0 auto;padding:0 20px 80px;}
+.section{display:none;}
+.section.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* SEC HEAD */
+.sec-head{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:0 20px 20px 20px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.sec-head .icon{font-size:30px;}
+.sec-head h2{font-family:'Fredoka One',cursive;font-size:20px;}
+.sec-head p{font-size:13px;color:rgba(255,255,255,.6);font-weight:600;margin-top:2px;}
+
+/* PROGRESS */
+.prog-wrap{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;margin-bottom:18px;}
+.prog-track{flex:1;height:14px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;transition:width .5s ease;background:linear-gradient(90deg,var(--c3),var(--c4));}
+.prog-txt{font-weight:900;font-size:13px;color:var(--c3);white-space:nowrap;font-family:'Fredoka One',cursive;}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+.chip{padding:5px 16px;border-radius:99px;font-weight:800;font-size:11px;cursor:pointer;border:2px solid transparent;transition:all .2s;text-transform:uppercase;letter-spacing:.5px;}
+.chip.active{border-color:currentColor;transform:scale(1.05);}
+.chip-all{background:rgba(255,255,255,.1);color:white;}
+.chip-speak{background:rgba(77,150,255,.2);color:var(--c4);}
+.chip-fixed{background:rgba(255,107,107,.2);color:var(--c1);}
+.chip-link{background:rgba(107,203,119,.2);color:var(--c3);}
+.chip-write{background:rgba(255,217,61,.2);color:var(--c2);}
+.chip-adv{background:rgba(255,107,223,.2);color:var(--c5);}
+
+/* FLASHCARD */
+.fc-wrap{perspective:1200px;margin-bottom:14px;}
+.flashcard{width:100%;min-height:250px;position:relative;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.68,-.55,.27,1.55);cursor:pointer;}
+.flashcard.flipped{transform:rotateY(180deg);}
+.card-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;border:3px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;min-height:250px;}
+.card-front{background:linear-gradient(135deg,#1e3a5f,#0d2137);border-color:var(--c4);}
+.card-back{transform:rotateY(180deg);}
+.cb-speak{background:linear-gradient(135deg,#0d2050,#080a30);border-color:var(--c4);}
+.cb-fixed{background:linear-gradient(135deg,#3d0a0a,#200505);border-color:var(--c1);}
+.cb-link{background:linear-gradient(135deg,#0d3320,#0a2010);border-color:var(--c3);}
+.cb-write{background:linear-gradient(135deg,#3d2a00,#201500);border-color:var(--c2);}
+.cb-adv{background:linear-gradient(135deg,#2d0a3d,#180520);border-color:var(--c5);}
+.ctag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:5px 14px;border-radius:99px;margin-bottom:16px;color:white;}
+.ct-front{background:var(--c4);}
+.ct-speak{background:var(--c4);}
+.ct-fixed{background:var(--c1);}
+.ct-link{background:var(--c3);color:var(--dark);}
+.ct-write{background:var(--c2);color:var(--dark);}
+.ct-adv{background:var(--c5);}
+.card-q{font-family:'Fredoka One',cursive;font-size:22px;color:white;line-height:1.3;margin-bottom:8px;}
+.card-hint{font-size:13px;color:rgba(255,255,255,.5);font-weight:600;}
+.card-a{font-size:16px;font-weight:700;color:white;line-height:1.65;}
+.card-a code{font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.12);padding:2px 8px;border-radius:6px;font-size:14px;color:var(--c2);}
+.card-a .eg{color:rgba(255,255,255,.65);font-style:italic;font-size:14px;}
+.card-a b{color:var(--c3);}
+.sound-wave{display:flex;align-items:center;gap:3px;position:absolute;top:12px;right:14px;}
+.sound-wave span{width:3px;background:rgba(255,255,255,.35);border-radius:99px;animation:wave 1s ease-in-out infinite;}
+.sound-wave span:nth-child(1){height:7px;animation-delay:0s;}
+.sound-wave span:nth-child(2){height:13px;animation-delay:.1s;}
+.sound-wave span:nth-child(3){height:19px;animation-delay:.2s;}
+.sound-wave span:nth-child(4){height:13px;animation-delay:.3s;}
+.sound-wave span:nth-child(5){height:7px;animation-delay:.4s;}
+@keyframes wave{0%,100%{transform:scaleY(1);}50%{transform:scaleY(.4);}}
+.flip-hint{text-align:center;font-size:12px;color:rgba(255,255,255,.4);font-weight:700;margin-top:8px;}
+
+/* NAV */
+.card-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 26px;}
+.btn{padding:11px 26px;border-radius:13px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;border:none;transition:all .15s;color:white;}
+.btn:active{transform:translateY(3px);box-shadow:none!important;}
+.btn-prev{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);box-shadow:0 4px 0 rgba(0,0,0,.3);}
+.btn-prev:hover{background:rgba(255,255,255,.2);}
+.btn-next{background:var(--c3);color:var(--dark);box-shadow:0 4px 0 #3a8f46;}
+.btn-next:hover{background:#7de882;}
+.card-ctr{font-family:'Fredoka One',cursive;font-size:17px;color:rgba(255,255,255,.5);}
+
+/* QUIZ */
+.quiz-card{background:rgba(255,255,255,.05);border:3px solid rgba(255,255,255,.1);border-radius:22px;padding:26px;margin-bottom:18px;position:relative;overflow:hidden;}
+.quiz-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(77,150,255,.04),rgba(107,203,119,.04));pointer-events:none;}
+.q-cat{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--c4);margin-bottom:10px;}
+.q-text{font-family:'Fredoka One',cursive;font-size:20px;color:white;line-height:1.4;margin-bottom:20px;}
+.q-text code{font-family:'JetBrains Mono',monospace;background:rgba(255,217,61,.15);padding:2px 8px;border-radius:6px;font-size:17px;color:var(--c2);}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.q-opt{padding:13px 15px;border-radius:14px;border:3px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-align:left;transition:all .15s;color:white;line-height:1.3;}
+.q-opt:hover:not(:disabled){border-color:var(--c4);background:rgba(77,150,255,.15);transform:translateY(-2px);box-shadow:0 4px 0 rgba(77,150,255,.3);}
+.q-opt.correct{border-color:var(--c3);background:rgba(107,203,119,.2);color:var(--c3);box-shadow:0 4px 0 rgba(107,203,119,.4);}
+.q-opt.wrong{border-color:var(--c1);background:rgba(255,107,107,.2);color:var(--c1);box-shadow:0 4px 0 rgba(255,107,107,.3);}
+.q-opt:disabled{cursor:default;}
+.feedback{display:none;border-radius:14px;padding:13px 16px;margin-top:12px;font-weight:700;font-size:14px;animation:slideUp .3s ease;}
+.feedback.show{display:flex;align-items:flex-start;gap:10px;}
+.fb-correct{background:rgba(107,203,119,.15);border:2px solid var(--c3);color:var(--c3);}
+.fb-wrong{background:rgba(255,107,107,.15);border:2px solid var(--c1);color:#ff9a9a;}
+.fb-icon{font-size:22px;flex-shrink:0;}
+.fb-text strong{display:block;font-size:16px;font-weight:900;margin-bottom:3px;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.q-nav{display:flex;justify-content:flex-end;margin-top:12px;}
+.btn-cont{background:var(--c3);color:var(--dark);box-shadow:0 4px 0 #3a8f46;display:none;}
+.btn-cont.show{display:block;}
+
+/* RESULTS */
+.results{display:none;text-align:center;padding:44px 20px;background:rgba(255,255,255,.05);border:3px solid rgba(255,255,255,.1);border-radius:22px;}
+.results.show{display:block;animation:popIn .6s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
+.res-emoji{font-size:68px;margin-bottom:10px;animation:bounce2 1s ease infinite;}
+@keyframes bounce2{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.res-title{font-family:'Fredoka One',cursive;font-size:30px;margin-bottom:8px;}
+.res-score{font-family:'Fredoka One',cursive;font-size:52px;margin:14px 0;}
+.res-score span{font-size:22px;color:rgba(255,255,255,.5);}
+.res-msg{font-size:15px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:26px;}
+.btn-retry{background:var(--c4);color:white;box-shadow:0 4px 0 #2060cc;padding:13px 40px;font-size:17px;}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;pointer-events:none;z-index:9999;animation:confettiFall 3s ease-in forwards;border-radius:2px;}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+.emoji-burst{position:fixed;pointer-events:none;z-index:9998;font-size:32px;animation:burstAway 1s ease forwards;}
+@keyframes burstAway{0%{transform:translate(0,0) scale(0);opacity:1;}50%{transform:translate(var(--dx),var(--dy)) scale(1.4);opacity:1;}100%{transform:translate(calc(var(--dx)*2),calc(var(--dy)*3)) scale(.5);opacity:0;}}
+
+/* RESUMEN */
+.res-block{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;margin-bottom:12px;}
+.res-block h3{font-family:'Fredoka One',cursive;font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.res-block p,.res-block li{font-size:14px;font-weight:600;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:3px;}
+.res-block ul{padding-left:18px;}
+.res-block code{font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.1);padding:1px 7px;border-radius:5px;font-size:13px;color:var(--c2);}
+.res-block .eg{color:rgba(255,255,255,.6);font-style:italic;}
+.res-block b{color:var(--c3);}
+.tbadge{display:inline-block;padding:3px 11px;border-radius:99px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+.tb-speak{background:rgba(77,150,255,.3);color:var(--c4);}
+.tb-fixed{background:rgba(255,107,107,.3);color:var(--c1);}
+.tb-link{background:rgba(107,203,119,.3);color:var(--c3);}
+.tb-write{background:rgba(255,217,61,.3);color:var(--c2);}
+.tb-adv{background:rgba(255,107,223,.3);color:var(--c5);}
+.tw{overflow-x:auto;margin-top:10px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:rgba(255,255,255,.08);font-weight:800;padding:9px 11px;text-align:left;border-bottom:2px solid rgba(255,255,255,.1);color:rgba(255,255,255,.9);}
+td{padding:8px 11px;border-bottom:1px solid rgba(255,255,255,.07);font-weight:600;color:rgba(255,255,255,.75);}
+tr:last-child td{border-bottom:none;}
+td code{font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;color:var(--c2);font-size:12px;}
+td em{color:rgba(255,255,255,.55);font-size:12px;}
+
+/* ANIMS */
+@keyframes cardBounce{0%,100%{transform:translateY(0);}30%{transform:translateY(-12px);}60%{transform:translateY(-6px);}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+@keyframes rainbow{0%{border-color:var(--c1);}20%{border-color:var(--c2);}40%{border-color:var(--c3);}60%{border-color:var(--c4);}80%{border-color:var(--c5);}100%{border-color:var(--c1);}}
+.anim-bounce{animation:cardBounce .6s ease;}
+.anim-shake{animation:shake .5s ease;}
+.anim-rainbow{animation:rainbow .8s linear;}
+
+@media(max-width:540px){.q-opts{grid-template-columns:1fr;}.card-q{font-size:18px;}main{padding:0 12px 80px;}.tabs{padding:10px 12px 0;gap:3px;}.tab{padding:7px 12px;font-size:12px;}}
+</style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<header>
+  <div class="logo">B2 English</div>
+  <div class="badge">Unit 2 — Complete</div>
+  <div class="xp-wrap">
+    <div class="lives" id="lives">❤️❤️❤️</div>
+    <span class="xp-num">⚡<span id="xpNum">0</span></span>
+    <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showSec('flashcards',this)">📇 Flashcards</button>
+  <button class="tab" onclick="showSec('quiz',this)">🧠 Quiz</button>
+  <button class="tab" onclick="showSec('resumen',this)">📖 Resumen</button>
+</div>
+
+<main>
+
+<!-- ══ FLASHCARDS ══ -->
+<div class="section active" id="flashcards">
+  <div class="sec-head">
+    <span class="icon">📇</span>
+    <div><h2>Tarjetas de Memorización</h2><p>10 sonidos únicos — ¡cada tarjeta suena diferente! 🎵</p></div>
+  </div>
+  <div class="chips">
+    <button class="chip chip-all active" onclick="filterCards('all',this)">🌐 Todas</button>
+    <button class="chip chip-speak" onclick="filterCards('speak',this)">🗣️ Speaking</button>
+    <button class="chip chip-fixed" onclick="filterCards('fixed',this)">🔴 Fixed Phrases</button>
+    <button class="chip chip-link" onclick="filterCards('link',this)">🟢 Linking</button>
+    <button class="chip chip-write" onclick="filterCards('write',this)">✍️ Writing</button>
+    <button class="chip chip-adv" onclick="filterCards('adv',this)">💜 Adverbs</button>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-track"><div class="prog-fill" id="cardProg" style="width:0%"></div></div>
+    <span class="prog-txt" id="cardCtr">1 / 30</span>
+  </div>
+  <div class="fc-wrap">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="card-face card-front">
+        <div class="sound-wave"><span></span><span></span><span></span><span></span><span></span></div>
+        <span class="ctag ct-front">Concepto</span>
+        <div class="card-q" id="cardQ"></div>
+        <div class="card-hint" id="cardHint"></div>
+      </div>
+      <div class="card-face card-back" id="cardBack">
+        <span class="ctag" id="cardBackTag">Respuesta</span>
+        <div class="card-a" id="cardA"></div>
+      </div>
+    </div>
+  </div>
+  <p class="flip-hint">👆 Toca la tarjeta para voltearla</p>
+  <div class="card-nav" style="margin-top:12px;">
+    <button class="btn btn-prev" onclick="prevCard()">← Anterior</button>
+    <span class="card-ctr" id="cardNum">1 / 30</span>
+    <button class="btn btn-next" onclick="nextCard()">Siguiente →</button>
+  </div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div class="section" id="quiz">
+  <div class="sec-head">
+    <span class="icon">🧠</span>
+    <div><h2>Quiz Interactivo</h2><p>¡Responde y gana XP! Los errores cuestan una vida ❤️</p></div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-track"><div class="prog-fill" id="quizProg" style="width:0%"></div></div>
+    <span class="prog-txt" id="quizCtr">1 / 20</span>
+  </div>
+  <div id="quizArea">
+    <div class="quiz-card" id="quizCard">
+      <div class="q-cat" id="qCat"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-opts" id="qOpts"></div>
+      <div class="feedback" id="feedback">
+        <span class="fb-icon" id="fbIcon"></span>
+        <div class="fb-text" id="fbText"></div>
+      </div>
+      <div class="q-nav"><button class="btn btn-cont" id="btnCont" onclick="nextQ()">Continuar →</button></div>
+    </div>
+  </div>
+  <div class="results" id="results">
+    <div class="res-emoji" id="resEmoji">🏆</div>
+    <div class="res-title" id="resTitle"></div>
+    <div class="res-score"><span id="resCorrect">0</span> / <span id="resTotal">20</span> <span>correctas</span></div>
+    <div class="res-msg" id="resMsg"></div>
+    <button class="btn btn-retry" onclick="restartQuiz()">🔄 Repetir Quiz</button>
+  </div>
+</div>
+
+<!-- ══ RESUMEN ══ -->
+<div class="section" id="resumen">
+  <div class="sec-head">
+    <span class="icon">📖</span>
+    <div><h2>Resumen Unit 2</h2><p>Toda la teoría organizada por tema</p></div>
+  </div>
+
+  <div class="res-block">
+    <h3>🗣️ <span class="tbadge tb-speak">Speaking</span> &nbsp;Part 2 — Comparar fotos</h3>
+    <p>Tienes que hablar sobre tus fotos durante <b>1 minuto</b> y responder una pregunta sobre las fotos de tu compañero.</p>
+    <p style="margin-top:8px;"><b>Estructura de la respuesta:</b></p>
+    <ul>
+      <li>Describe brevemente qué ves en cada foto</li>
+      <li>Compara las similitudes y diferencias</li>
+      <li>Da tu opinión personal</li>
+    </ul>
+    <div class="tw"><table>
+      <tr><th>Para comparar</th><th>Ejemplo</th></tr>
+      <tr><td><code>both</code></td><td><em>In both photos there are people eating</em></td></tr>
+      <tr><td><code>similar / similarity</code></td><td><em>There's a similarity between the two</em></td></tr>
+      <tr><td><code>different / difference</code></td><td><em>The biggest difference is...</em></td></tr>
+      <tr><td><code>same</code></td><td><em>The situation is the same in both</em></td></tr>
+      <tr><td><code>other</code></td><td><em>In the other photo...</em></td></tr>
+      <tr><td><code>while / whereas</code></td><td><em>While one shows X, the other shows Y</em></td></tr>
+    </table></div>
+    <p style="margin-top:10px;"><b>Quick steps Part 2:</b></p>
+    <ul>
+      <li>Piensa antes de hablar — no improvises sin plan</li>
+      <li>No intentes describir todo, menciona similitudes y diferencias clave</li>
+      <li>Cuando tu compañero hable, escucha pero no interrumpas</li>
+    </ul>
+  </div>
+
+  <div class="res-block">
+    <h3>🗣️ <span class="tbadge tb-speak">Speaking</span> &nbsp;Part 3 — Discusión colaborativa</h3>
+    <p>Hablas con tu compañero sobre prompts durante <b>2 minutos</b> y luego tomáis una decisión.</p>
+    <ul>
+      <li>Usa <code>Let's...</code> y <code>Why don't we...</code> para hacer sugerencias</li>
+      <li>Usa modales para especular: <code>It may be...</code> / <code>It couldn't be...</code></li>
+      <li>Usa adverbios de grado para matizar</li>
+      <li>Empieza a hablar cuanto antes — no pierdas tiempo</li>
+    </ul>
+  </div>
+
+  <div class="res-block">
+    <h3>🔴 <span class="tbadge tb-fixed">Fixed Phrases</span> &nbsp;Expresiones fijas</h3>
+    <div class="tw"><table>
+      <tr><th>Expresión</th><th>Significado</th></tr>
+      <tr><td><code>at ease</code></td><td>completamente relajado</td></tr>
+      <tr><td><code>at first sight</code></td><td>a primera vista</td></tr>
+      <tr><td><code>break my heart</code></td><td>romperme el corazón</td></tr>
+      <tr><td><code>get on my nerves</code></td><td>ponerme nervioso / irritarme</td></tr>
+      <tr><td><code>is attracted to</code></td><td>estar atraído por</td></tr>
+      <tr><td><code>keep you company</code></td><td>hacerte compañía</td></tr>
+      <tr><td><code>leave me alone</code></td><td>dejarme solo / en paz</td></tr>
+      <tr><td><code>lose touch</code></td><td>perder el contacto</td></tr>
+      <tr><td><code>propose to someone</code></td><td>pedirle matrimonio a alguien</td></tr>
+      <tr><td><code>takes me for granted</code></td><td>dar por sentado / no valorarme</td></tr>
+    </table></div>
+  </div>
+
+  <div class="res-block">
+    <h3>🟢 <span class="tbadge tb-link">Linking</span> &nbsp;Expresiones de enlace</h3>
+    <div class="tw"><table>
+      <tr><th>Expresión</th><th>Uso</th><th>Ejemplo</th></tr>
+      <tr><td><code>as soon as</code></td><td>en cuanto / tan pronto como</td><td><em>As soon as I saw him, I knew</em></td></tr>
+      <tr><td><code>at first</code></td><td>al principio</td><td><em>At first I thought it was easy</em></td></tr>
+      <tr><td><code>at the same time</code></td><td>al mismo tiempo</td><td><em>They were laughing at the same time</em></td></tr>
+      <tr><td><code>between those two times</code></td><td>mientras tanto / en ese período</td><td><em>Between those two times, a lot changed</em></td></tr>
+      <tr><td><code>immediately</code></td><td>inmediatamente</td><td><em>He immediately called her back</em></td></tr>
+      <tr><td><code>very surprisingly</code></td><td>sorprendentemente</td><td><em>Very surprisingly, she said yes</em></td></tr>
+      <tr><td><code>initially</code></td><td>inicialmente</td><td><em>Initially he found it hard</em></td></tr>
+      <tr><td><code>in the meantime</code></td><td>mientras tanto</td><td><em>In the meantime, I had breakfast</em></td></tr>
+      <tr><td><code>once</code></td><td>una vez que</td><td><em>Once he woke up, he left</em></td></tr>
+      <tr><td><code>instantly</code></td><td>al instante</td><td><em>The alarm went off instantly</em></td></tr>
+      <tr><td><code>simultaneously</code></td><td>simultáneamente</td><td><em>Both things happened simultaneously</em></td></tr>
+    </table></div>
+  </div>
+
+  <div class="res-block">
+    <h3>✍️ <span class="tbadge tb-write">Writing</span> &nbsp;Essay — Part 1</h3>
+    <p><b>Estructura del essay B2:</b></p>
+    <ul>
+      <li><b>Intro:</b> presenta el tema y tu opinión general</li>
+      <li><b>Párrafo 1:</b> primer punto — <code>First of all, / To begin with,</code></li>
+      <li><b>Párrafo 2:</b> segundo punto — <code>Secondly, / Furthermore,</code></li>
+      <li><b>Párrafo 3:</b> tercer punto o contraargumento — <code>Finally, / However,</code></li>
+      <li><b>Conclusión:</b> resumen — <code>To sum up, / In conclusion,</code></li>
+    </ul>
+    <p style="margin-top:8px;"><b>Addition links:</b> <code>First of all</code> / <code>For another thing</code> / <code>For one thing</code> / <code>In the first place</code> / <code>Lastly</code> / <code>Next</code> / <code>On balance</code> / <code>To conclude</code></p>
+    <p style="margin-top:6px;"><b>Registro:</b> formal — usa expresiones como <code>we should not</code> en vez de <code>we shouldn't</code></p>
+    <p style="margin-top:6px;">📝 Entre <b>140-190 palabras</b> — planifica antes de escribir</p>
+  </div>
+
+  <div class="res-block">
+    <h3>✍️ <span class="tbadge tb-write">Writing</span> &nbsp;Article — Part 2</h3>
+    <ul>
+      <li>Escribe para una <b>web/revista</b> — tono más cercano al lector</li>
+      <li>Usa preguntas directas: <code>Do you ever...?</code> / <code>You might think... but...</code></li>
+      <li>Título atractivo que enganche al lector</li>
+      <li>Mezcla pasado continuo y pasado perfecto continuo para dar vivacidad</li>
+      <li>Entre <b>140-190 palabras</b></li>
+    </ul>
+  </div>
+
+  <div class="res-block" style="border-color:rgba(255,107,223,.3);background:rgba(255,107,223,.05);">
+    <h3>💜 <span class="tbadge tb-adv">Adverbs of Degree</span> &nbsp;Grado de intensidad</h3>
+    <div class="tw"><table>
+      <tr><th>Adverbio</th><th>Uso</th><th>Ejemplo</th></tr>
+      <tr><td><code>totally / completely / absolutely</code></td><td>100% intensidad</td><td><em>totally tired, absolutely impossible</em></td></tr>
+      <tr><td><code>really / very</code></td><td>alta intensidad</td><td><em>really late, very good</em></td></tr>
+      <tr><td><code>quite / fairly</code></td><td>intensidad media</td><td><em>quite a long day, fairly comfortable</em></td></tr>
+      <tr><td><code>slightly / a bit</code></td><td>baja intensidad</td><td><em>slightly late, a bit surprised</em></td></tr>
+    </table></div>
+    <p style="margin-top:10px;">⚠️ <b>Regla importante:</b> <code>absolutely / totally / completely</code> se usan con adjetivos <b>extremos</b> (impossible, exhausted, brilliant) — <b>NO</b> con adjetivos graduables (good, tired, late)</p>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ══ AUDIO ══
+const AC = new (window.AudioContext||window.webkitAudioContext)();
+function playTone(f,t='sine',d=.3,v=.3,delay=0){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.connect(g);g.connect(AC.destination);
+  o.type=t;o.frequency.value=f;
+  const s=AC.currentTime+delay;
+  g.gain.setValueAtTime(0,s);
+  g.gain.linearRampToValueAtTime(v,s+.02);
+  g.gain.exponentialRampToValueAtTime(.001,s+d);
+  o.start(s);o.stop(s+d+.05);
+}
+const cardSounds=[
+  ()=>{[523,659,784].forEach((f,i)=>playTone(f,'sine',.2,.3,i*.1));},
+  ()=>{playTone(440,'triangle',.3,.3);playTone(554,'triangle',.2,.25,.15);},
+  ()=>{[300,400,500,600].forEach((f,i)=>playTone(f,'square',.15,.15,i*.06));},
+  ()=>{[880,660,440].forEach((f,i)=>playTone(f,'sine',.15,.22,i*.1));},
+  ()=>{[392,494,587,698].forEach((f,i)=>playTone(f,'sawtooth',.1,.12,i*.07));},
+  ()=>{[1047,784,523].forEach((f,i)=>playTone(f,'sine',.1,.2,i*.06));},
+  ()=>{[262,330,392,523].forEach((f,i)=>playTone(f,'triangle',.2,.2,i*.07));},
+  ()=>{[600,700,800,900,1000].forEach((f,i)=>playTone(f,'sine',.07,.15,i*.05));},
+  ()=>{playTone(440,'sine',.4,.3);playTone(443,'sine',.4,.25);},
+  ()=>{[523,659,784,1047,784,659,523].forEach((f,i)=>playTone(f,'sine',.12,.15,i*.06));},
+];
+function playCorrect(){[523,659,784,1047].forEach((f,i)=>playTone(f,'sine',.15,.3,i*.08));}
+function playWrong(){[220,180,150].forEach((f,i)=>playTone(f,'sawtooth',.15,.3,i*.15));}
+function playFlip(){playTone(800,'sine',.08,.2);playTone(600,'sine',.06,.15,.05);}
+function playLevelUp(){[523,659,784,1047,1319].forEach((f,i)=>playTone(f,'sine',.2,.3,i*.08));}
+document.addEventListener('click',()=>{if(AC.state==='suspended')AC.resume();},{once:true});
+
+// PARTICLES
+const cols=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff6bdf','#ff9a3c'];
+for(let i=0;i<18;i++){
+  const p=document.createElement('div');p.className='particle';
+  const s=Math.random()*40+10;
+  p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${Math.random()*15+10}s;animation-delay:${Math.random()*10}s;`;
+  document.getElementById('particles').appendChild(p);
+}
+
+// ══ DATA — FLASHCARDS ══
+const allCards=[
+  // SPEAKING
+  {topic:'speak',q:'¿Cuánto tiempo tienes en Speaking Part 2?',hint:'Comparar fotos',a:'<b>1 minuto</b> hablando sobre tus fotos + responder una pregunta sobre las fotos de tu compañero'},
+  {topic:'speak',q:'¿Cómo usas "both" al comparar fotos?',hint:'Las dos fotos tienen algo en común',a:'<code>In both photos there are people eating out</code><br><span class="eg">Se usa para destacar lo que comparten las dos fotos</span>'},
+  {topic:'speak',q:'¿Cómo expresas una diferencia importante en Part 2?',hint:'The biggest...',a:'<code>The biggest difference between them is that...</code><br><span class="eg">The biggest difference is that one shows X while the other shows Y</span>'},
+  {topic:'speak',q:'¿Qué estrategia debes usar en Speaking Part 3?',hint:'Sugerencias + especulación',a:'Usa <code>Let\'s...</code> y <code>Why don\'t we...</code> para sugerir<br>Usa <code>It may be...</code> / <code>It couldn\'t be...</code> para especular'},
+  {topic:'speak',q:'¿Qué significa "It may be / It could be / It looks like"?',hint:'Expresiones de especulación',a:'Son expresiones para <b>especular</b> sobre lo que ves en las fotos sin estar seguro<br><span class="eg">It could be a restaurant, it looks quite busy</span>'},
+  // FIXED PHRASES
+  {topic:'fixed',q:'¿Qué significa "get on my nerves"?',hint:'Reacción emocional negativa',a:'<b>Ponerme nervioso / irritarme</b><br><span class="eg">He keeps calling early — it\'s starting to get on my nerves</span>'},
+  {topic:'fixed',q:'¿Qué significa "takes me for granted"?',hint:'No te valoran',a:'<b>Dar por sentado / no valorarte</b><br><span class="eg">Sometimes I think he takes me for granted</span>'},
+  {topic:'fixed',q:'¿Qué significa "lose touch"?',hint:'Relaciones',a:'<b>Perder el contacto</b> con alguien<br><span class="eg">It\'s sad when you move away and lose touch with friends</span>'},
+  {topic:'fixed',q:'¿Qué significa "at first sight"?',hint:'Primera vez que ves algo',a:'<b>A primera vista</b><br><span class="eg">I fell in love with the city at first sight</span>'},
+  {topic:'fixed',q:'¿Qué significa "keep you company"?',hint:'No estar solo',a:'<b>Hacerte compañía</b><br><span class="eg">When I needed someone to keep me company, he was there</span>'},
+  {topic:'fixed',q:'¿Qué significa "break my heart"?',hint:'Emoción muy intensa',a:'<b>Romperme el corazón</b><br><span class="eg">The book doesn\'t look interesting, but it will break your heart</span>'},
+  {topic:'fixed',q:'¿Qué significa "propose to someone"?',hint:'Relación seria',a:'<b>Pedirle matrimonio</b> a alguien<br><span class="eg">You become engaged when you propose to someone</span>'},
+  // LINKING
+  {topic:'link',q:'¿Cuándo usas "at first"?',hint:'Hablar del principio de algo',a:'<b>Al principio</b> — para indicar el estado inicial antes de un cambio<br><span class="eg">At first he thought the course was easy</span>'},
+  {topic:'link',q:'¿Cuándo usas "as soon as"?',hint:'Dos acciones muy seguidas',a:'<b>En cuanto / tan pronto como</b> — acción inmediatamente después de otra<br><span class="eg">As soon as I saw him, I felt at ease</span>'},
+  {topic:'link',q:'¿Cuándo usas "in the meantime"?',hint:'Dos cosas pasan a la vez',a:'<b>Mientras tanto</b> — algo ocurre durante el tiempo de espera<br><span class="eg">The flight was delayed; in the meantime, I had breakfast</span>'},
+  {topic:'link',q:'¿Cuándo usas "immediately" vs "instantly"?',hint:'Ambas = sin demora',a:'Ambas = <b>inmediatamente / al instante</b><br><code>immediately</code> → más formal<br><code>instantly</code> → énfasis en que fue en ese preciso momento'},
+  {topic:'link',q:'¿Cuándo usas "once"?',hint:'Condición temporal',a:'<b>Una vez que / cuando ya</b> — introduce el momento en que algo se completa<br><span class="eg">Once Dan had woken up, he put the light on</span>'},
+  {topic:'link',q:'¿Cuándo usas "simultaneously"?',hint:'Dos acciones al mismo tiempo',a:'<b>Simultáneamente</b> — dos cosas pasan exactamente a la vez<br><span class="eg">You are trying to do too many things simultaneously</span>'},
+  // WRITING
+  {topic:'write',q:'¿Qué linking words introduces el primer punto en un essay?',hint:'Addition links',a:'<code>First of all</code> / <code>To begin with</code> / <code>For one thing</code> / <code>In the first place</code>'},
+  {topic:'write',q:'¿Qué linking word introduces la conclusión del essay?',hint:'Para cerrar',a:'<code>To sum up</code> / <code>In conclusion</code> / <code>On balance</code> / <code>To conclude</code>'},
+  {topic:'write',q:'¿Cuál es la diferencia entre essay y article en B2?',hint:'Registro y audiencia',a:'<b>Essay:</b> registro formal, para el profesor, sin preguntas directas<br><b>Article:</b> más cercano al lector, usa <code>Do you ever...?</code> y <code>You might think...</code>'},
+  {topic:'write',q:'¿Cuántas palabras debes escribir en Writing B2?',hint:'Ni más ni menos',a:'Entre <b>140 y 190 palabras</b> — planifica antes de escribir, no improvises'},
+  {topic:'write',q:'¿Cómo se involucra al lector en un article?',hint:'Preguntas retóricas',a:'Usando expresiones como:<br><code>Do you ever feel...?</code><br><code>You might think... but...</code><br><code>How would you feel if...?</code>'},
+  // ADVERBS
+  {topic:'adv',q:'¿Cuándo usas "totally / completely / absolutely"?',hint:'Adjetivos extremos',a:'Con adjetivos <b>extremos/no graduables</b>: impossible, exhausted, brilliant<br><span class="eg">absolutely impossible ✅ — absolutely good ❌</span>'},
+  {topic:'adv',q:'¿Cuándo usas "slightly / a bit"?',hint:'Matiz pequeño',a:'Para expresar <b>baja intensidad</b><br><span class="eg">slightly late, a bit surprised, a bit tired</span><br>Se usan con adjetivos graduables'},
+  {topic:'adv',q:'¿Cuándo usas "quite / fairly"?',hint:'Ni mucho ni poco',a:'Para expresar <b>intensidad media</b><br><span class="eg">quite a long day, fairly comfortable, quite right</span>'},
+  {topic:'adv',q:'¿Cuál es la diferencia entre "really" y "absolutely"?',hint:'Nivel de intensidad',a:'<code>really</code> → alta intensidad, adjetivos graduables: <span class="eg">really tired</span><br><code>absolutely</code> → máxima intensidad, adjetivos extremos: <span class="eg">absolutely exhausted</span>'},
+  {topic:'adv',q:'¿Se puede decir "very impossible"?',hint:'Piensa en el tipo de adjetivo',a:'<b>NO</b> ❌ — "impossible" es un adjetivo extremo<br>Lo correcto es: <code>totally / completely / absolutely impossible</code> ✅'},
+  {topic:'adv',q:'Completa: "It was (1)_____ good, overall. The train was (2)_____ late."',hint:'totally/pretty vs slightly/really',a:'(1) <b>totally / pretty</b> good ✅<br>(2) <b>slightly / really</b> late ✅<br><span class="eg">Del diálogo de Sam y Jess sobre el viaje a la montaña</span>'},
+];
+
+// ══ DATA — QUIZ ══
+const quizData=[
+  {cat:'🗣️ Speaking Part 2',q:'¿Cuánto tiempo tienes para hablar en Speaking Part 2?',opts:['30 segundos','1 minuto','2 minutos','3 minutos'],correct:1,exp:'En Part 2 tienes 1 minuto para comparar tus fotos y dar tu opinión.'},
+  {cat:'🗣️ Speaking Part 2',q:'Completa: "In both photos there are people ______"',opts:['eat','to eat','eating','eaten'],correct:2,exp:'Tras "there are people" usamos -ing. "eating out" = comiendo fuera.'},
+  {cat:'🗣️ Speaking Part 3',q:'¿Qué expresión usas para hacer una sugerencia en Part 3?',opts:['I suggest you...','Let\'s consider...','You should...','Have you tried...'],correct:1,exp:'En Part 3 usas "Let\'s..." y "Why don\'t we..." para hacer sugerencias colaborativas.'},
+  {cat:'🔴 Fixed Phrases',q:'"He keeps calling early — it\'s starting to ______ me."',opts:['break','get on the nerves of','get on my nerves','lose touch with'],correct:2,exp:'"Get on my nerves" = ponerme nervioso/irritarme. Es una fixed phrase completa.'},
+  {cat:'🔴 Fixed Phrases',q:'"It\'s sad when you move away and ______ with your friends."',opts:['lose contact','lose touch','break heart','leave alone'],correct:1,exp:'"Lose touch" = perder el contacto. La frase correcta es "lose touch with".'},
+  {cat:'🔴 Fixed Phrases',q:'"When I needed someone to ______ me company, he was there."',opts:['give','make','keep','take'],correct:2,exp:'"Keep someone company" = hacerle compañía. SIEMPRE con "keep", nunca "give" o "make".'},
+  {cat:'🔴 Fixed Phrases',q:'"Sometimes I think Jeff ______ how lucky he is to have me."',opts:['forgets','takes me for granted','loses touch','breaks my heart'],correct:1,exp:'"Takes me for granted" = da por sentado mi valor / no me valora. Expresión fija.'},
+  {cat:'🟢 Linking Expressions',q:'"______ he thought the course was easy. But then he realised it was more difficult."',opts:['At first','As soon as','Once','Immediately'],correct:0,exp:'"At first" = al principio. Indica el estado inicial antes de que algo cambie.'},
+  {cat:'🟢 Linking Expressions',q:'"The flight was at 9:15 but I arrived at 7:30. ______ I had some breakfast."',opts:['At first','As soon as','In the meantime','Once'],correct:2,exp:'"In the meantime" = mientras tanto. Algo ocurre durante el período de espera.'},
+  {cat:'🟢 Linking Expressions',q:'"______ Dan had woken up, he put the light on."',opts:['At first','Once','Immediately','As soon as'],correct:1,exp:'"Once" = una vez que / cuando ya. Indica que algo ocurre después de completar la acción anterior.'},
+  {cat:'🟢 Linking Expressions',q:'"The thief broke the car window. ______ a loud alarm went off."',opts:['Once','In the meantime','Instantly','At first'],correct:2,exp:'"Instantly" = al instante, en ese preciso momento. Enfatiza la inmediatez.'},
+  {cat:'✍️ Writing Essay',q:'¿Qué linking word introduces el PRIMER punto de un essay?',opts:['To conclude','In addition','First of all','However'],correct:2,exp:'"First of all" introduce el primer argumento. También: "To begin with" o "For one thing".'},
+  {cat:'✍️ Writing Essay',q:'¿Qué linking word introduce la CONCLUSIÓN del essay?',opts:['First of all','Furthermore','Nevertheless','To sum up'],correct:3,exp:'"To sum up" y "In conclusion" son los más comunes para cerrar un essay B2.'},
+  {cat:'✍️ Writing',q:'¿Cuántas palabras debe tener un Writing B2?',opts:['100-120','120-150','140-190','200-250'],correct:2,exp:'Entre 140-190 palabras. Ni más ni menos — penalizan si te pasas o te quedas corto.'},
+  {cat:'✍️ Writing Article',q:'¿Cuál de estas frases es apropiada para un article pero NO para un essay?',opts:['To begin with, budget flights enable...','Do you ever feel that birthdays were more fun as a kid?','First of all, we should consider...','In conclusion, I am convinced that...'],correct:1,exp:'Los articles usan preguntas directas al lector ("Do you ever...?"). Los essays son más formales y no usan este recurso.'},
+  {cat:'💜 Adverbs of Degree',q:'¿Cuál es CORRECTO con el adjetivo "impossible"?',opts:['very impossible','really impossible','absolutely impossible','fairly impossible'],correct:2,exp:'"Impossible" es un adjetivo extremo/absoluto. Solo se combina con "absolutely/totally/completely". "Very" y "really" van con adjetivos graduables.'},
+  {cat:'💜 Adverbs of Degree',q:'"The train was ______ late, though only ten minutes."',opts:['absolutely','completely','slightly','totally'],correct:2,exp:'"Slightly" = un poco / ligeramente. Para baja intensidad con adjetivos graduables como "late".'},
+  {cat:'💜 Adverbs of Degree',q:'¿Cuál de estas combinaciones es INCORRECTA?',opts:['slightly surprised','totally exhausted','absolutely tired','completely impossible'],correct:2,exp:'"Absolutely tired" es incorrecto. "Tired" es graduable → usa "very/really tired". "Absolutely" va con extremos como "exhausted".'},
+  {cat:'💜 Adverbs of Degree',q:'"Yes, sometimes I\'m ______ surprised to find that I enjoy train journeys."',opts:['slightly / a bit','totally / completely','absolutely / very','fairly / quite'],correct:0,exp:'"Slightly/a bit surprised" = un poco sorprendido. Baja intensidad con adjetivo graduable "surprised".'},
+  {cat:'🗣️ Speaking',q:'¿Qué NO debes hacer cuando tu compañero habla en Part 2?',opts:['Escuchar atentamente','Pensar en tu respuesta','Interrumpirle','Tomar notas mentales'],correct:2,exp:'El libro indica: "listen to what they say but don\'t interrupt". Al final te harán una pregunta sobre sus fotos.'},
+];
+
+// ══ STATE ══
+let curCards=[...allCards],cardIdx=0,xp=0,lives=3,qIdx=0,qScore=0,answered=false,shuffledQ=[];
+
+// ══ TABS ══
+function showSec(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='quiz'&&shuffledQ.length===0)initQuiz();
+}
+
+// ══ FLASHCARDS ══
+const topicMap={speak:{cls:'cb-speak',tag:'ct-speak',label:'Speaking'},fixed:{cls:'cb-fixed',tag:'ct-fixed',label:'Fixed Phrase'},link:{cls:'cb-link',tag:'ct-link',label:'Linking'},write:{cls:'cb-write',tag:'ct-write',label:'Writing'},adv:{cls:'cb-adv',tag:'ct-adv',label:'Adverb'}};
+
+function filterCards(topic,btn){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  curCards=topic==='all'?[...allCards]:allCards.filter(c=>c.topic===topic);
+  cardIdx=0;renderCard();
+}
+
+function renderCard(){
+  const c=curCards[cardIdx];
+  document.getElementById('cardQ').textContent=c.q;
+  document.getElementById('cardHint').textContent=c.hint?`💡 ${c.hint}`:'';
+  document.getElementById('cardA').innerHTML=c.a;
+  const tm=topicMap[c.topic];
+  document.getElementById('cardBack').className=`card-face card-back ${tm.cls}`;
+  const bt=document.getElementById('cardBackTag');
+  bt.className=`ctag ${tm.tag}`;bt.textContent=tm.label;
+  document.getElementById('flashcard').classList.remove('flipped');
+  const pct=Math.round(((cardIdx+1)/curCards.length)*100);
+  document.getElementById('cardProg').style.width=pct+'%';
+  document.getElementById('cardCtr').textContent=`${cardIdx+1} / ${curCards.length}`;
+  document.getElementById('cardNum').textContent=`${cardIdx+1} / ${curCards.length}`;
+}
+
+function flipCard(){
+  const fc=document.getElementById('flashcard');
+  const flipping=!fc.classList.contains('flipped');
+  fc.classList.toggle('flipped');
+  if(flipping){
+    cardSounds[cardIdx%cardSounds.length]();
+    addXP(5);
+    fc.classList.add('anim-rainbow');
+    setTimeout(()=>fc.classList.remove('anim-rainbow'),900);
+  } else { playFlip(); }
+}
+function nextCard(){cardIdx=cardIdx<curCards.length-1?cardIdx+1:0;renderCard();playTone(600,'sine',.1,.15);}
+function prevCard(){cardIdx=cardIdx>0?cardIdx-1:curCards.length-1;renderCard();playTone(400,'sine',.1,.15);}
+
+// ══ QUIZ ══
+function initQuiz(){
+  shuffledQ=[...quizData].sort(()=>Math.random()-.5);
+  qIdx=0;qScore=0;lives=3;answered=false;
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('quizArea').style.display='block';
+  updateLives();renderQ();
+}
+function updateLives(){const h=['❤️','❤️','❤️'];for(let i=lives;i<3;i++)h[i]='🖤';document.getElementById('lives').textContent=h.join('');}
+function renderQ(){
+  if(qIdx>=shuffledQ.length){showResults();return;}
+  const q=shuffledQ[qIdx];answered=false;
+  document.getElementById('qCat').innerHTML=q.cat;
+  document.getElementById('qText').innerHTML=q.q;
+  document.getElementById('feedback').className='feedback';
+  document.getElementById('btnCont').className='btn btn-cont';
+  const el=document.getElementById('qOpts');el.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const b=document.createElement('button');b.className='q-opt';b.innerHTML=opt;
+    b.onclick=()=>selectAns(i,q.correct,q.exp);el.appendChild(b);
+  });
+  const pct=Math.round((qIdx/shuffledQ.length)*100);
+  document.getElementById('quizProg').style.width=pct+'%';
+  document.getElementById('quizCtr').textContent=`${qIdx+1} / ${shuffledQ.length}`;
+}
+function selectAns(chosen,correct,exp){
+  if(answered)return;answered=true;
+  const opts=document.querySelectorAll('.q-opt');
+  opts.forEach(o=>o.disabled=true);opts[correct].classList.add('correct');
+  const fb=document.getElementById('feedback'),card=document.getElementById('quizCard');
+  if(chosen===correct){
+    opts[chosen].classList.add('correct');
+    fb.className='feedback show fb-correct';
+    document.getElementById('fbIcon').textContent=correctEmojis[Math.floor(Math.random()*correctEmojis.length)];
+    document.getElementById('fbText').innerHTML=`<strong>¡Correcto! 🎉</strong>${exp}`;
+    qScore++;addXP(25);playCorrect();
+    spawnConfetti(event);spawnEmojiBurst(event);
+    card.classList.add('anim-bounce');setTimeout(()=>card.classList.remove('anim-bounce'),600);
+  } else {
+    opts[chosen].classList.add('wrong');
+    fb.className='feedback show fb-wrong';
+    document.getElementById('fbIcon').textContent='💥';
+    document.getElementById('fbText').innerHTML=`<strong>Incorrecto</strong>${exp}`;
+    lives=Math.max(0,lives-1);updateLives();playWrong();
+    card.classList.add('anim-shake');setTimeout(()=>card.classList.remove('anim-shake'),500);
+  }
+  document.getElementById('btnCont').className='btn btn-cont show';
+}
+function nextQ(){qIdx++;if(qIdx>=shuffledQ.length){showResults();return;}renderQ();}
+function showResults(){
+  document.getElementById('quizArea').style.display='none';
+  const res=document.getElementById('results');res.classList.add('show');
+  const pct=Math.round((qScore/shuffledQ.length)*100);
+  document.getElementById('resCorrect').textContent=qScore;
+  document.getElementById('resTotal').textContent=shuffledQ.length;
+  document.getElementById('quizProg').style.width='100%';
+  let emoji,title,msg;
+  if(pct===100){emoji='🏆';title='¡PERFECTO!';msg='¡Dominas la Unit 2 al 100%! ¡Crack total!';}
+  else if(pct>=80){emoji='🥇';title='¡Excelente!';msg='Muy buen nivel. Repasa los fallos y vuelve a por el 100%.';}
+  else if(pct>=60){emoji='🥈';title='¡Bien!';msg='Buen trabajo. Refuerza las fixed phrases y linking words.';}
+  else{emoji='💪';title='Sigue practicando';msg='Repasa el resumen y las flashcards. ¡Tú puedes!';}
+  document.getElementById('resEmoji').textContent=emoji;
+  document.getElementById('resTitle').textContent=title;
+  document.getElementById('resMsg').textContent=msg;
+  playLevelUp();setTimeout(()=>spawnMassConfetti(),300);addXP(60);
+}
+function restartQuiz(){shuffledQ=[];initQuiz();}
+
+const correctEmojis=['🎉','⭐','🔥','💯','🚀','🎯','✨','🏆','💪','🥳'];
+function spawnConfetti(e){
+  const cx=e?e.clientX:window.innerWidth/2,cy=e?e.clientY:window.innerHeight/2;
+  for(let i=0;i<30;i++){
+    const el=document.createElement('div');el.className='confetti-piece';
+    el.style.cssText=`left:${cx+(Math.random()-.5)*200}px;top:${cy}px;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${Math.random()*1.5+1}s;animation-delay:${Math.random()*.3}s;width:${Math.random()*10+5}px;height:${Math.random()*10+5}px;border-radius:${Math.random()>.5?'50%':'2px'};`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
+  }
+}
+function spawnMassConfetti(){
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div');el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${Math.random()*2+2}s;animation-delay:${Math.random()}s;width:${Math.random()*12+4}px;height:${Math.random()*12+4}px;border-radius:${Math.random()>.5?'50%':'2px'};`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),4000);
+  }
+}
+function spawnEmojiBurst(e){
+  const emojis=['⭐','🔥','💯','✨','🎯','💪','🚀','🎉'];
+  const cx=e?e.clientX:window.innerWidth/2,cy=e?e.clientY:window.innerHeight/2;
+  for(let i=0;i<6;i++){
+    const el=document.createElement('div');el.className='emoji-burst';
+    const angle=(i/6)*Math.PI*2,dist=80+Math.random()*60;
+    el.style.cssText=`left:${cx}px;top:${cy}px;--dx:${Math.cos(angle)*dist}px;--dy:${Math.sin(angle)*dist}px;animation-duration:${.8+Math.random()*.4}s;`;
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1500);
+  }
+}
+function addXP(amt){xp+=amt;document.getElementById('xpNum').textContent=xp;document.getElementById('xpFill').style.width=Math.min((xp%300)/300*100,100)+'%';}
+
+renderCard();
+</script>
+</body>
+</html>
