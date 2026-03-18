@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unidad 4 — XML & XPath</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #58cc02;
+    --green-dark: #46a302;
+    --green-light: #d7f5a0;
+    --blue: #1cb0f6;
+    --blue-dark: #0499d4;
+    --red: #ff4b4b;
+    --red-light: #ffd7d7;
+    --yellow: #ffc800;
+    --yellow-light: #fff3cc;
+    --purple: #ce82ff;
+    --orange: #ff9600;
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --shadow: 0 4px 0 rgba(0,0,0,0.15);
+    --shadow-sm: 0 2px 0 rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: #fff;
+    border-bottom: 2px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--green);
+    letter-spacing: -1px;
+  }
+  .logo span { color: var(--text); }
+  .xp-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 300px;
+    margin-left: auto;
+  }
+  .xp-label { font-weight: 800; font-size: 13px; color: var(--orange); white-space: nowrap; }
+  .xp-track {
+    flex: 1;
+    height: 12px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--yellow), var(--orange));
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(.34,1.56,.64,1);
+    width: 0%;
+  }
+  .streak { font-size: 20px; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    padding: 20px 24px 0;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .tab {
+    padding: 10px 24px;
+    border-radius: 12px 12px 0 0;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    background: var(--border);
+    color: var(--text-muted);
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .tab.active {
+    background: var(--card);
+    color: var(--green-dark);
+    border-bottom: 3px solid var(--green);
+  }
+  .tab:hover:not(.active) { background: #dde3ea; }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── SECTION HEADER ── */
+  .section-title {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 0 16px 16px 16px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title .icon { font-size: 28px; }
+  .section-title h2 { font-size: 20px; font-weight: 900; }
+  .section-title p { font-size: 14px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 16px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), #8be04c);
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+  .progress-text { font-weight: 800; font-size: 13px; color: var(--green-dark); white-space: nowrap; }
+
+  /* ── FLASHCARD ── */
+  .flashcard-wrap {
+    perspective: 1000px;
+    margin-bottom: 20px;
+  }
+  .flashcard {
+    width: 100%;
+    min-height: 240px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(.68,-.55,.27,1.55);
+    cursor: pointer;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    border: 3px solid var(--border);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+    min-height: 240px;
+  }
+  .card-front {
+    background: linear-gradient(135deg, #e8f8ff 0%, #d0f0ff 100%);
+    border-color: var(--blue);
+  }
+  .card-back {
+    background: linear-gradient(135deg, #f0fff4 0%, #d0fae1 100%);
+    border-color: var(--green);
+    transform: rotateY(180deg);
+  }
+  .card-tag {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+  }
+  .card-front .card-tag { background: var(--blue); color: white; }
+  .card-back .card-tag { background: var(--green); color: white; }
+  .card-question {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+  .card-hint {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .card-answer {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .card-answer code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0,0,0,0.07);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #0d6efd;
+  }
+  .flip-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ── NAV BUTTONS ── */
+  .card-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn:active { transform: translateY(2px); }
+  .btn-prev {
+    background: var(--border);
+    color: var(--text-muted);
+    box-shadow: 0 3px 0 #c5c9d0;
+  }
+  .btn-prev:hover { background: #dde3ea; }
+  .btn-next {
+    background: var(--green);
+    color: white;
+    box-shadow: 0 4px 0 var(--green-dark);
+  }
+  .btn-next:hover { background: #64d700; }
+  .card-counter {
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--text-muted);
+  }
+
+  /* ── TOPIC CHIPS ── */
+  .topic-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .chip {
+    padding: 6px 16px;
+    border-radius: 99px;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .chip.active { border-color: currentColor; }
+  .chip-all { background: #eee8ff; color: #6b21a8; }
+  .chip-xml { background: #e0f2fe; color: #0369a1; }
+  .chip-xpath { background: #fef3c7; color: #b45309; }
+  .chip-xsl { background: #f0fdf4; color: #166534; }
+
+  /* ── QUIZ SECTION ── */
+  .quiz-card {
+    background: var(--card);
+    border: 3px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .quiz-category {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--blue-dark);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .quiz-question {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.4;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+  .quiz-question code {
+    font-family: 'JetBrains Mono', monospace;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 17px;
+    color: #7c3aed;
+  }
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .quiz-option {
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 3px solid var(--border);
+    background: var(--card);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    color: var(--text);
+    line-height: 1.35;
+  }
+  .quiz-option:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: #f0fbff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 #b3dff5;
+  }
+  .quiz-option.correct {
+    border-color: var(--green);
+    background: var(--green-light);
+    color: var(--green-dark);
+    box-shadow: 0 3px 0 var(--green-dark);
+  }
+  .quiz-option.wrong {
+    border-color: var(--red);
+    background: var(--red-light);
+    color: var(--red);
+    box-shadow: 0 3px 0 #cc3b3b;
+  }
+  .quiz-option:disabled { cursor: default; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    display: none;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    font-weight: 700;
+    font-size: 15px;
+    animation: slideUp 0.3s ease;
+  }
+  .feedback.show { display: flex; align-items: flex-start; gap: 12px; }
+  .feedback.correct-fb { background: var(--green-light); border: 2px solid var(--green); color: var(--green-dark); }
+  .feedback.wrong-fb { background: var(--red-light); border: 2px solid var(--red); color: var(--red); }
+  .feedback-icon { font-size: 22px; flex-shrink: 0; }
+  .feedback-text strong { display: block; font-size: 16px; font-weight: 900; margin-bottom: 2px; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── QUIZ NAV ── */
+  .quiz-nav {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  .btn-continue {
+    background: var(--green);
+    color: white;
+    box-shadow: 0 4px 0 var(--green-dark);
+    display: none;
+  }
+  .btn-continue.show { display: block; }
+  .btn-continue:hover { background: #64d700; }
+
+  /* ── RESULTS ── */
+  .results {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--card);
+    border: 3px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+  }
+  .results.show { display: block; animation: slideUp 0.5s ease; }
+  .results-emoji { font-size: 64px; margin-bottom: 12px; }
+  .results-title { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+  .results-score { font-size: 52px; font-weight: 900; margin: 16px 0; }
+  .results-score span { font-size: 22px; color: var(--text-muted); font-weight: 700; }
+  .results-msg { font-size: 16px; color: var(--text-muted); font-weight: 600; margin-bottom: 28px; }
+  .btn-retry {
+    background: var(--blue);
+    color: white;
+    box-shadow: 0 4px 0 var(--blue-dark);
+    padding: 14px 40px;
+  }
+  .btn-retry:hover { background: #38beff; }
+
+  /* ── SUMMARY SECTION ── */
+  .summary-block {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .summary-block h3 {
+    font-size: 17px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .summary-block p, .summary-block li {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 4px;
+  }
+  .summary-block ul { padding-left: 20px; }
+  .summary-block code {
+    font-family: 'JetBrains Mono', monospace;
+    background: #f1f5f9;
+    padding: 1px 7px;
+    border-radius: 5px;
+    font-size: 13px;
+    color: #7c3aed;
+  }
+  .tag-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tag-xml { background: #e0f2fe; color: #0369a1; }
+  .tag-xpath { background: #fef3c7; color: #b45309; }
+  .tag-xsl { background: #f0fdf4; color: #166534; }
+
+  .table-wrap { overflow-x: auto; margin-top: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f8fafc; font-weight: 800; padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); font-weight: 600; color: #374151; }
+  tr:last-child td { border-bottom: none; }
+  td code { font-family: 'JetBrains Mono', monospace; background: #f1f5f9; padding: 1px 6px; border-radius: 4px; color: #7c3aed; font-size: 12px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 540px) {
+    .quiz-options { grid-template-columns: 1fr; }
+    .card-question { font-size: 18px; }
+    main { padding: 0 12px 60px; }
+    header { padding: 0 12px; }
+    .tabs { padding: 16px 12px 0; gap: 4px; }
+    .tab { padding: 8px 14px; font-size: 12px; }
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .bounce { animation: bounce 0.5s ease; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">XML<span>learn</span></div>
+  <div style="font-size:13px;font-weight:700;color:var(--text-muted);">Unidad 4 — Lenguaje de Marcas</div>
+  <div class="xp-bar">
+    <span class="streak">🔥</span>
+    <span class="xp-label">XP: <span id="xpCount">0</span></span>
+    <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showSection('flashcards',this)">📇 Flashcards</button>
+  <button class="tab" onclick="showSection('quiz',this)">🧠 Quiz</button>
+  <button class="tab" onclick="showSection('resumen',this)">📖 Resumen</button>
+</div>
+
+<main>
+
+  <!-- ══════════ FLASHCARDS ══════════ -->
+  <div class="section active" id="flashcards">
+    <div class="section-title">
+      <span class="icon">📇</span>
+      <div>
+        <h2>Tarjetas de Memorización</h2>
+        <p>Haz click en la tarjeta para ver la respuesta</p>
+      </div>
+    </div>
+
+    <div class="topic-chips">
+      <button class="chip chip-all active" onclick="filterCards('all',this)">🌐 Todas</button>
+      <button class="chip chip-xml" onclick="filterCards('xml',this)">📄 XML</button>
+      <button class="chip chip-xpath" onclick="filterCards('xpath',this)">🔍 XPath</button>
+      <button class="chip chip-xsl" onclick="filterCards('xsl',this)">🔄 XSL</button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="cardProgress" style="width:0%"></div></div>
+      <span class="progress-text" id="cardCounter">1 / 20</span>
+    </div>
+
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="card-face card-front">
+          <span class="card-tag">Concepto</span>
+          <div class="card-question" id="cardQ"></div>
+          <div class="card-hint" id="cardHint"></div>
+        </div>
+        <div class="card-face card-back">
+          <span class="card-tag">Respuesta</span>
+          <div class="card-answer" id="cardA"></div>
+        </div>
+      </div>
+    </div>
+    <p class="flip-hint" style="text-align:center;justify-content:center;">👆 Toca la tarjeta para voltearla</p>
+
+    <div class="card-nav" style="margin-top:16px;">
+      <button class="btn btn-prev" onclick="prevCard()">← Anterior</button>
+      <span class="card-counter" id="cardNum">1 / 20</span>
+      <button class="btn btn-next" onclick="nextCard()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ QUIZ ══════════ -->
+  <div class="section" id="quiz">
+    <div class="section-title">
+      <span class="icon">🧠</span>
+      <div>
+        <h2>Quiz Interactivo</h2>
+        <p>Pon a prueba tus conocimientos</p>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="quizProgress" style="width:0%"></div></div>
+      <span class="progress-text" id="quizCounter">1 / 15</span>
+    </div>
+
+    <div id="quizArea">
+      <div class="quiz-card" id="quizCard">
+        <div class="quiz-category" id="quizCat"></div>
+        <div class="quiz-question" id="quizQ"></div>
+        <div class="quiz-options" id="quizOpts"></div>
+        <div class="feedback" id="feedback">
+          <span class="feedback-icon" id="fbIcon"></span>
+          <div class="feedback-text" id="fbText"></div>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn btn-continue" id="btnContinue" onclick="nextQuestion()">Continuar →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="results" id="results">
+      <div class="results-emoji" id="resultEmoji">🏆</div>
+      <div class="results-title" id="resultTitle">¡Quiz completado!</div>
+      <div class="results-score"><span id="correctCount">0</span> / <span id="totalCount">15</span> <span>correctas</span></div>
+      <div class="results-msg" id="resultMsg"></div>
+      <button class="btn btn-retry" onclick="restartQuiz()">🔄 Repetir Quiz</button>
+    </div>
+  </div>
+
+  <!-- ══════════ RESUMEN ══════════ -->
+  <div class="section" id="resumen">
+    <div class="section-title">
+      <span class="icon">📖</span>
+      <div>
+        <h2>Resumen de la Unidad 4</h2>
+        <p>Conversión y Adaptación de Documentos XML</p>
+      </div>
+    </div>
+
+    <div class="summary-block">
+      <h3>📄 <span class="tag-badge tag-xml">XML</span> &nbsp;¿Qué es XML?</h3>
+      <p><strong>eXtensible Markup Language</strong> — lenguaje de marcado para almacenar y transportar datos de forma estructurada.</p>
+      <ul>
+        <li>Similar a HTML pero <strong>sin etiquetas predefinidas</strong> — tú defines las tuyas</li>
+        <li>Pensado para el intercambio de datos entre sistemas y plataformas</li>
+        <li>Garantiza portabilidad, escalabilidad y validación de datos</li>
+      </ul>
+    </div>
+
+    <div class="summary-block">
+      <h3>⚙️ <span class="tag-badge tag-xml">XML</span> &nbsp;XMLHttpRequest</h3>
+      <p>Objeto JavaScript para hacer peticiones HTTP sin recargar la página.</p>
+      <ul>
+        <li>Peticiones <code>GET</code> y <code>POST</code></li>
+        <li>Modo síncrono (<code>false</code>) o asíncrono (<code>true</code>)</li>
+        <li>Procesa respuestas en XML, JSON, texto o HTML</li>
+      </ul>
+      <p style="margin-top:10px;"><strong>Flujo de carga de un XML:</strong></p>
+      <ul>
+        <li>1. <code>new XMLHttpRequest()</code> — crear objeto XHR</li>
+        <li>2. <code>xhr.open("GET","archivo.xml",false)</code> — abrir conexión</li>
+        <li>3. <code>xhr.send()</code> — enviar solicitud</li>
+        <li>4. <code>xhr.status === 200</code> — comprobar respuesta</li>
+        <li>5. <code>xhr.responseXML</code> — convertir a XML</li>
+        <li>6. <code>getElementsByTagName("pelicula")</code> — extraer datos</li>
+      </ul>
+    </div>
+
+    <div class="summary-block">
+      <h3>🔍 <span class="tag-badge tag-xpath">XPath</span> &nbsp;Elementos básicos</h3>
+      <p>Lenguaje para navegar y consultar documentos XML.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Tipo</th><th>Identificador</th><th>Ejemplo</th></tr>
+          <tr><td>Nodo raíz</td><td><code>/</code></td><td><code>/peliculas</code></td></tr>
+          <tr><td>Nodos elemento</td><td><code>//</code></td><td><code>//pelicula</code></td></tr>
+          <tr><td>Nodo texto</td><td><code>text()</code></td><td><code>//titulo/text()</code></td></tr>
+          <tr><td>Atributo</td><td><code>@</code></td><td><code>//pelicula/@id</code></td></tr>
+          <tr><td>Filtro</td><td><code>[]</code></td><td><code>//pelicula[año > 2000]</code></td></tr>
+          <tr><td>Nodo padre</td><td><code>..</code></td><td><code>//titulo/..</code></td></tr>
+          <tr><td>Cualquier elemento</td><td><code>*</code></td><td><code>//pelicula/*</code></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="summary-block">
+      <h3>🔣 <span class="tag-badge tag-xpath">XPath</span> &nbsp;Funciones</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Función</th><th>Uso</th><th>Ejemplo</th></tr>
+          <tr><td><code>count()</code></td><td>Contar elementos</td><td><code>count(//libro)</code></td></tr>
+          <tr><td><code>sum()</code></td><td>Sumar valores</td><td><code>sum(//precio)</code></td></tr>
+          <tr><td><code>contains()</code></td><td>Buscar texto</td><td><code>contains(titulo,'Cien')</code></td></tr>
+          <tr><td><code>starts-with()</code></td><td>Texto al inicio</td><td><code>starts-with(tel,'+57')</code></td></tr>
+          <tr><td><code>substring()</code></td><td>Extraer texto</td><td><code>substring(//fecha,1,4)</code></td></tr>
+        </table>
+      </div>
+      <p style="margin-top:10px;">En JS se usa <code>xmlDoc.evaluate(expresión, xmlDoc, null, XPathResult.ANY_TYPE, null)</code> y el resultado con <code>.numberValue</code> o <code>.stringValue</code></p>
+    </div>
+
+    <div class="summary-block">
+      <h3>🔄 <span class="tag-badge tag-xsl">XSL</span> &nbsp;XSLT</h3>
+      <p><strong>eXtensible Stylesheet Language Transformations</strong> — transforma XML en HTML, texto plano u otros formatos.</p>
+      <ul>
+        <li>Extrae, modifica y presenta datos <strong>sin alterar el XML original</strong></li>
+        <li>Genera etiquetas HTML (<code>&lt;table&gt;</code>, <code>&lt;div&gt;</code>, etc.) dinámicamente</li>
+        <li>Para vincular un XSL al XML: <code>&lt;?xml-stylesheet type="text/xsl" href="archivo.xsl"?&gt;</code></li>
+        <li>No todos los navegadores modernos admiten XSLT nativo — puede requerir servidor local o JavaScript</li>
+      </ul>
+    </div>
+
+    <div class="summary-block" style="border-color:var(--green);background:linear-gradient(135deg,#f0fff4,#e6faea);">
+      <h3>✅ Resumen clave</h3>
+      <ul>
+        <li>XPath facilita la selección eficiente de datos en XML</li>
+        <li>XPath permite manipular y transformar datos XML de manera sencilla</li>
+        <li>XSLT convierte XML en HTML, texto plano o incluso otros XML</li>
+        <li>XSLT estructura y filtra información según necesidades específicas</li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════
+// DATA
+// ══════════════════════════════════
+const allCards = [
+  { topic:'xml', q:'¿Qué significa XML?', hint:'Siglas en inglés', a:'<b>eXtensible Markup Language</b> — Lenguaje de marcado extensible para almacenar y transportar datos de forma estructurada.' },
+  { topic:'xml', q:'¿En qué se diferencia XML de HTML?', hint:'Piensa en las etiquetas', a:'XML <b>no tiene etiquetas predefinidas</b>. El desarrollador define sus propias etiquetas según sus necesidades.' },
+  { topic:'xml', q:'¿Qué es XMLHttpRequest?', hint:'Es un objeto de JS', a:'Objeto de JavaScript que permite hacer <b>peticiones HTTP</b> a un servidor sin necesidad de recargar la página.' },
+  { topic:'xml', q:'¿Qué hace <code>xhr.open("GET","archivo.xml",false)</code>?', hint:'Tercer parámetro = modo', a:'Abre una conexión GET al archivo XML de forma <b>síncrona</b> (false = espera respuesta antes de continuar).' },
+  { topic:'xml', q:'¿Qué código HTTP indica éxito en una petición XHR?', hint:'Número de 3 cifras', a:'El código <b>200</b> — <code>xhr.status === 200</code> indica que la petición fue exitosa.' },
+  { topic:'xml', q:'¿Qué propiedad convierte la respuesta XHR en documento XML?', hint:'Propiedad de xhr', a:'<code>xhr.responseXML</code> transforma la respuesta en un documento XML navegable.' },
+  { topic:'xml', q:'¿Cómo se obtienen todos los elementos <code>&lt;pelicula&gt;</code>?', hint:'Método del DOM XML', a:'<code>xmlDoc.getElementsByTagName("pelicula")</code> devuelve todos los nodos con esa etiqueta.' },
+  { topic:'xml', q:'¿Cómo se extrae el texto de una etiqueta dentro de un nodo XML?', hint:'Selector + propiedad', a:'<code>pelicula.querySelector("titulo").textContent</code> — accede al contenido de texto del nodo.' },
+  { topic:'xml', q:'¿Cómo se añade una fila dinámica a una tabla HTML desde JS?', hint:'Propiedad innerHTML', a:'<code>tabla.innerHTML += fila</code> — concatena el HTML de la nueva fila a la tabla.' },
+  { topic:'xml', q:'¿Qué muestra <code>console.error("...")</code> en el manejo de errores?', hint:'Herramienta de depuración', a:'Muestra un <b>mensaje de error en la consola</b> del navegador para depurar fallos al cargar el XML.' },
+  { topic:'xpath', q:'¿Qué es XPath?', hint:'Sirve para navegar', a:'Lenguaje para <b>navegar y consultar</b> la estructura de un documento XML, seleccionando nodos específicos.' },
+  { topic:'xpath', q:'¿Qué representa el símbolo <code>/</code> en XPath?', hint:'Es el inicio de todo', a:'El <b>nodo raíz</b> — el nodo principal que contiene todo el documento XML.' },
+  { topic:'xpath', q:'¿Para qué sirve <code>//</code> en XPath?', hint:'Doble barra', a:'Selecciona <b>nodos elemento</b> en cualquier parte del documento. Ej: <code>//pelicula</code>' },
+  { topic:'xpath', q:'¿Qué hace <code>@</code> en XPath?', hint:'Se usa para meta-info', a:'Accede a los <b>atributos</b> de un elemento. Ej: <code>//pelicula/@id</code>' },
+  { topic:'xpath', q:'¿Qué hace <code>..</code> en XPath?', hint:'Subir en el árbol', a:'Navega al <b>nodo padre</b>. Ej: <code>//titulo/..</code> devuelve el nodo <code>&lt;pelicula&gt;</code> que contiene ese título.' },
+  { topic:'xpath', q:'¿Qué hace <code>//pelicula[año > 2000]</code>?', hint:'Los corchetes filtran', a:'Selecciona todas las películas cuyo año es <b>mayor que 2000</b> — los <code>[]</code> aplican filtros o condiciones.' },
+  { topic:'xpath', q:'¿Qué devuelve <code>count(//pelicula)</code>?', hint:'Función de conteo', a:'El <b>número total</b> de elementos <code>&lt;pelicula&gt;</code> en el documento XML.' },
+  { topic:'xpath', q:'¿Qué hace <code>contains(titulo,\'Cien\')</code> en XPath?', hint:'Búsqueda parcial', a:'Busca elementos cuyo título <b>contenga</b> la cadena "Cien". Ej: encuentra "Cien Años de Soledad".' },
+  { topic:'xpath', q:'¿Cómo se ejecuta XPath en JavaScript?', hint:'Método del documento XML', a:'<code>xmlDoc.evaluate(expresión, xmlDoc, null, XPathResult.ANY_TYPE, null)</code> y se accede con <code>.numberValue</code> o <code>.stringValue</code>.' },
+  { topic:'xsl', q:'¿Qué es XSLT?', hint:'Siglas en inglés', a:'<b>eXtensible Stylesheet Language Transformations</b> — lenguaje para transformar XML en HTML, texto plano u otros formatos.' },
+  { topic:'xsl', q:'¿XSLT altera la estructura original del XML?', hint:'Respuesta directa', a:'<b>No</b>. XSLT extrae, modifica y presenta los datos <b>sin alterar</b> la estructura original del archivo XML.' },
+  { topic:'xsl', q:'¿Cómo se vincula un archivo XSL a un documento XML?', hint:'Va en la primera línea del XML', a:'Con la instrucción: <code>&lt;?xml-stylesheet type="text/xsl" href="archivo.xsl"?&gt;</code>' },
+];
+
+const quizData = [
+  { cat:'📄 XML', q:'¿Cuál es la diferencia principal entre XML y HTML?', opts:['XML tiene etiquetas fijas como HTML','XML no tiene etiquetas predefinidas, el desarrollador las define','XML solo sirve para páginas web','XML no puede contener datos anidados'], correct:1, explanation:'XML permite definir tus propias etiquetas según tus necesidades, a diferencia de HTML que tiene etiquetas fijas predefinidas.' },
+  { cat:'⚙️ XMLHttpRequest', q:'¿Qué método debes llamar para enviar la petición al servidor?', opts:['xhr.open()','xhr.start()','xhr.send()','xhr.request()'], correct:2, explanation:'xhr.send() es el método que envía efectivamente la petición HTTP al servidor.' },
+  { cat:'⚙️ XMLHttpRequest', q:'¿Qué significa el tercer parámetro false en xhr.open("GET","archivo.xml",false)?', opts:['La petición fallará','La petición es síncrona (espera respuesta)','No se envían datos','La petición es asíncrona'], correct:1, explanation:'false indica modo síncrono: el script se detiene hasta recibir la respuesta del servidor.' },
+  { cat:'⚙️ XMLHttpRequest', q:'¿Qué propiedad de XHR convierte la respuesta en un documento XML navegable?', opts:['xhr.responseText','xhr.responseData','xhr.responseXML','xhr.responseJSON'], correct:2, explanation:'xhr.responseXML transforma automáticamente la respuesta en un objeto XML que puedes recorrer con el DOM.' },
+  { cat:'⚙️ XMLHttpRequest', q:'¿Qué código HTTP indica que la petición fue exitosa?', opts:['xhr.status === 404','xhr.status === 500','xhr.status === 200','xhr.status === 301'], correct:2, explanation:'El código 200 OK es la respuesta estándar de éxito en peticiones HTTP.' },
+  { cat:'🔍 XPath', q:'¿Qué nodo representa el símbolo / en XPath?', opts:['Nodo texto','Nodo atributo','Nodo hermano','Nodo raíz'], correct:3, explanation:'/ representa el nodo raíz, el nodo principal que contiene todo el documento XML.' },
+  { cat:'🔍 XPath', q:'¿Cuál es la expresión XPath para seleccionar TODAS las películas del documento?', opts:['/pelicula','../pelicula','//pelicula','@pelicula'], correct:2, explanation:'// selecciona nodos en cualquier parte del documento. //pelicula encuentra todas las etiquetas <pelicula>.' },
+  { cat:'🔍 XPath', q:'¿Qué hace el token @ en XPath?', opts:['Selecciona el nodo padre','Accede a atributos de un elemento','Aplica un filtro','Selecciona cualquier elemento'], correct:1, explanation:'@ se usa para acceder a atributos. Por ejemplo //pelicula/@id obtiene el atributo id de cada película.' },
+  { cat:'🔍 XPath', q:'¿Cuál es el resultado de //pelicula[año > 2000]?', opts:['Todas las películas del documento','Solo la película del año 2000','Películas estrenadas después del año 2000','Error de sintaxis'], correct:2, explanation:'Los corchetes [] aplican filtros. [año > 2000] filtra solo las películas cuyo año sea mayor que 2000.' },
+  { cat:'🔍 XPath', q:'¿Qué hace .. en XPath?', opts:['Selecciona el nodo texto','Selecciona cualquier elemento','Navega al nodo padre','Aplica un filtro doble'], correct:2, explanation:'.. navega al nodo padre. //titulo/.. devuelve el nodo <pelicula> que contiene ese título.' },
+  { cat:'🔣 Funciones XPath', q:'¿Qué función XPath cuenta el número de elementos?', opts:['sum()','total()','count()','length()'], correct:2, explanation:'count() cuenta los elementos que coinciden. Ej: count(//pelicula) devuelve el número total de películas.' },
+  { cat:'🔣 Funciones XPath', q:'¿Qué hace contains(titulo, "Cien") en XPath?', opts:['Busca un título exactamente igual a "Cien"','Busca elementos cuyo título CONTENGA "Cien"','Cuenta los títulos','Elimina elementos con "Cien"'], correct:1, explanation:'contains() hace búsqueda parcial. Busca cualquier título que contenga la cadena "Cien" en su texto.' },
+  { cat:'🔄 XSL/XSLT', q:'¿Qué significa XSLT?', opts:['eXtensible Stylesheet Language Tags','eXtensible Syntax Language Transformations','eXtensible Stylesheet Language Transformations','eXtra Simple Layout Tags'], correct:2, explanation:'XSLT = eXtensible Stylesheet Language Transformations. Transforma documentos XML en HTML u otros formatos.' },
+  { cat:'🔄 XSL/XSLT', q:'¿XSLT modifica el archivo XML original al transformarlo?', opts:['Sí, lo sobreescribe','No, trabaja sin alterar el XML original','Solo si se indica explícitamente','Depende del navegador'], correct:1, explanation:'XSLT extrae, modifica y presenta los datos SIN alterar la estructura original del archivo XML.' },
+  { cat:'🔄 XSL/XSLT', q:'¿Cómo se vincula un archivo XSL a un documento XML?', opts:['Con una etiqueta <link> dentro del XML','Con <?xml-stylesheet type="text/xsl" href="archivo.xsl"?>','Importándolo con JavaScript','Con @import al inicio del XML'], correct:1, explanation:'La instrucción de procesamiento <?xml-stylesheet?> en el XML indica al navegador qué archivo XSL aplicar.' },
+];
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let currentCards = [...allCards];
+let cardIndex = 0;
+let xp = 0;
+let quizIndex = 0;
+let quizScore = 0;
+let answered = false;
+let shuffledQuiz = [];
+
+// ══════════════════════════════════
+// TABS
+// ══════════════════════════════════
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'quiz' && shuffledQuiz.length === 0) initQuiz();
+}
+
+// ══════════════════════════════════
+// FLASHCARDS
+// ══════════════════════════════════
+function filterCards(topic, btn) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  currentCards = topic === 'all' ? [...allCards] : allCards.filter(c => c.topic === topic);
+  cardIndex = 0;
+  renderCard();
+}
+
+function renderCard() {
+  const card = currentCards[cardIndex];
+  document.getElementById('cardQ').innerHTML = card.q;
+  document.getElementById('cardHint').textContent = card.hint ? `💡 ${card.hint}` : '';
+  document.getElementById('cardA').innerHTML = card.a;
+  document.getElementById('flashcard').classList.remove('flipped');
+  const pct = Math.round(((cardIndex + 1) / currentCards.length) * 100);
+  document.getElementById('cardProgress').style.width = pct + '%';
+  document.getElementById('cardCounter').textContent = `${cardIndex + 1} / ${currentCards.length}`;
+  document.getElementById('cardNum').textContent = `${cardIndex + 1} / ${currentCards.length}`;
+}
+
+function flipCard() {
+  const card = document.getElementById('flashcard');
+  card.classList.toggle('flipped');
+  if (card.classList.contains('flipped')) {
+    addXP(5);
+    card.classList.add('bounce');
+    setTimeout(() => card.classList.remove('bounce'), 500);
+  }
+}
+
+function nextCard() {
+  if (cardIndex < currentCards.length - 1) {
+    cardIndex++;
+    renderCard();
+  } else {
+    cardIndex = 0;
+    renderCard();
+  }
+}
+
+function prevCard() {
+  if (cardIndex > 0) {
+    cardIndex--;
+    renderCard();
+  }
+}
+
+// ══════════════════════════════════
+// QUIZ
+// ══════════════════════════════════
+function initQuiz() {
+  shuffledQuiz = [...quizData].sort(() => Math.random() - 0.5);
+  quizIndex = 0;
+  quizScore = 0;
+  answered = false;
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('quizArea').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (quizIndex >= shuffledQuiz.length) { showResults(); return; }
+  const q = shuffledQuiz[quizIndex];
+  answered = false;
+  document.getElementById('quizCat').innerHTML = q.cat;
+  document.getElementById('quizQ').innerHTML = q.q;
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('btnContinue').className = 'btn btn-continue';
+
+  const optsEl = document.getElementById('quizOpts');
+  optsEl.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i, q.correct, q.explanation);
+    optsEl.appendChild(btn);
+  });
+
+  const pct = Math.round((quizIndex / shuffledQuiz.length) * 100);
+  document.getElementById('quizProgress').style.width = pct + '%';
+  document.getElementById('quizCounter').textContent = `${quizIndex + 1} / ${shuffledQuiz.length}`;
+}
+
+function selectAnswer(chosen, correct, explanation) {
+  if (answered) return;
+  answered = true;
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach(o => o.disabled = true);
+  opts[correct].classList.add('correct');
+
+  const fb = document.getElementById('feedback');
+  const fbIcon = document.getElementById('fbIcon');
+  const fbText = document.getElementById('fbText');
+
+  if (chosen === correct) {
+    opts[chosen].classList.add('correct');
+    fb.className = 'feedback show correct-fb';
+    fbIcon.textContent = '🎉';
+    fbText.innerHTML = `<strong>¡Correcto!</strong>${explanation}`;
+    quizScore++;
+    addXP(20);
+    document.getElementById('quizCard').classList.add('bounce');
+    setTimeout(() => document.getElementById('quizCard').classList.remove('bounce'), 500);
+  } else {
+    opts[chosen].classList.add('wrong');
+    fb.className = 'feedback show wrong-fb';
+    fbIcon.textContent = '❌';
+    fbText.innerHTML = `<strong>Incorrecto</strong>${explanation}`;
+    document.getElementById('quizCard').classList.add('shake');
+    setTimeout(() => document.getElementById('quizCard').classList.remove('shake'), 400);
+  }
+
+  document.getElementById('btnContinue').className = 'btn btn-continue show';
+}
+
+function nextQuestion() {
+  quizIndex++;
+  if (quizIndex >= shuffledQuiz.length) { showResults(); return; }
+  renderQuestion();
+}
+
+function showResults() {
+  document.getElementById('quizArea').style.display = 'none';
+  const results = document.getElementById('results');
+  results.classList.add('show');
+  const pct = Math.round((quizScore / shuffledQuiz.length) * 100);
+  document.getElementById('correctCount').textContent = quizScore;
+  document.getElementById('totalCount').textContent = shuffledQuiz.length;
+  document.getElementById('quizProgress').style.width = '100%';
+
+  let emoji, title, msg;
+  if (pct === 100) { emoji='🏆'; title='¡Perfecto!'; msg='Dominas la unidad al 100%. ¡Eres un máquina!'; }
+  else if (pct >= 80) { emoji='🥇'; title='¡Excelente!'; msg='Muy buen resultado. Repasa los fallos y vuelve a por el 100%.'; }
+  else if (pct >= 60) { emoji='🥈'; title='¡Bien!'; msg='Buen trabajo. Refuerza las tarjetas y vuelve a intentarlo.'; }
+  else { emoji='💪'; title='Sigue practicando'; msg='Repasa el resumen y las flashcards antes de repetir el quiz.'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultMsg').textContent = msg;
+  addXP(50);
+}
+
+function restartQuiz() {
+  shuffledQuiz = [];
+  initQuiz();
+}
+
+// ══════════════════════════════════
+// XP
+// ══════════════════════════════════
+function addXP(amount) {
+  xp += amount;
+  document.getElementById('xpCount').textContent = xp;
+  const pct = Math.min((xp % 200) / 200 * 100, 100);
+  document.getElementById('xpFill').style.width = pct + '%';
+}
+
+// ── INIT ──
+renderCard();
+</script>
+</body>
+</html>
